@@ -18,7 +18,7 @@ const TotalNumber = () => {
   ];
 
   return (
-    <Box display={"flex"} alignItems={"center"} gap={"20px"}>
+    <Box display={"flex"}justifyContent={"space-between"} gap={"10px"} width={"1120px"}>
       {cards.map((card, index) => (
         <Flex
           key={index}

@@ -1,28 +1,31 @@
-import React, { useState } from "react";
-import { Box, VStack, Button, Icon, Text } from "@chakra-ui/react";
-import { FiHome, FiUser, FiTruck, FiUsers, FiLogOut } from "react-icons/fi";
-
-const items = [
-  { label: "Asosiy", icon: FiHome },
-  { label: "Pazandalar", icon: FiUser },
-  { label: "Kuryerlar", icon: FiTruck },
-  { label: "Foydalanuvchilar", icon: FiUsers },
-];
+import React from "react";
+import { Box, VStack, Button, Text } from "@chakra-ui/react";
+import { FiHome, FiTruck, FiUsers, FiLogOut } from "react-icons/fi";
+import { MdGroups } from "react-icons/md";
+import { Link, useLocation } from "react-router-dom";
 
 const SideBar = () => {
-  const [active, setActive] = useState("Asosiy");
+  const location = useLocation();
+
+  const navItems = [
+    { label: "Asosiy", icon: <FiHome />, to: "/home" },
+    { label: "Pazandalar", icon: <FiUsers />, to: "/cooks" },
+    { label: "Kuryerlar", icon: <FiTruck />, to: "/couriers" },
+    { label: "Foydalanuvchilar", icon: <MdGroups />, to: "/users" },
+  ];
 
   return (
     <Box p={"12px"}>
       <Box
         w="300px"
-        h="620px"
+        h="100vh"
         bg="white"
         borderRadius="xl"
         p={4}
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
+        overflowY="auto"
       >
         <VStack align="stretch" spacing={2}>
           <Box mb={4} p={3} borderBottom="1px solid" borderColor="gray.200">
@@ -31,27 +34,39 @@ const SideBar = () => {
             </Text>
           </Box>
 
-          {items.map(({ label, icon }) => (
-            <Button
-              key={label}
-              justifyContent="flex-start"
-              variant="ghost"
-              fontWeight="normal"
-              fontSize="md"
-              borderRadius="xl"
-              border="1px solid"
-              borderColor="primary.light"
-              bg={active === label ? "primary.light" : "transparent"}
-              color={active === label ? "white" : "black"}
-              _hover={{
-                bg: active === label ? "primary.light" : "gray.200",
-              }}
-              onClick={() => setActive(label)}
-            >
-              {icon}
-              {label}
-            </Button>
-          ))}
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.to;
+            return (
+              <Button
+                key={item.label}
+                justifyContent="flex-start"
+                variant="ghost"
+                fontWeight="normal"
+                fontSize="md"
+                borderRadius="xl"
+                border="1px solid"
+                borderColor="primary.light"
+                bg={isActive ? "primary.light" : "transparent"}
+                color={isActive ? "white" : "black"}
+                _hover={{
+                  bg: isActive ? "primary.light" : "gray.200",
+                }}
+              >
+                <Link
+                  to={item.to}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                    gap: "8px",
+                  }}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              </Button>
+            );
+          })}
         </VStack>
 
         <Button

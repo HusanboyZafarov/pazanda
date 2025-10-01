@@ -9,11 +9,13 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { LuUser, LuLock, LuEye, LuEyeOff } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const isFilled = login.trim() !== "" && password.trim() !== "";
 
@@ -111,7 +113,6 @@ const Login = () => {
             _hover={{
               borderColor: isFilled ? "primary.light" : "gray.400",
             }}
-            _focus={{ borderColor: "primary.light", boxShadow: "none" }}
           />
         </InputGroup>
 
@@ -124,9 +125,8 @@ const Login = () => {
           rounded="xl"
           cursor={!isFilled ? "not-allowed" : "pointer"}
           onClick={() => {
-            window.location.href = "/home";
-          }
-          }
+              navigate("home");
+          }}
         >
           Kirish
         </Button>
