@@ -36,6 +36,8 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
     bazars: "",
   });
   const [isOpen, setIsOpen] = useState(false);
+  
+  console.log("AddCouriers render - isOpen:", isOpen);
 
   const resetAll = () => {
     setFormData({
@@ -77,24 +79,31 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
         variant="outline"
         bg="#B5D8CA80"
         _hover={{ bg: "primary.light", color: "white" }}
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          console.log("Button clicked, setting isOpen to true");
+          setIsOpen(true);
+        }}
       >
         <IoIosAddCircleOutline />
-        &nbsp;Kuryer qo‘shish
+        Kuryer qo‘shish
       </Button>
-
-      <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Portal>
-          <Dialog.Backdrop bg="blackAlpha.400" />
-          <Dialog.Positioner>
-            <Dialog.Content
-              bg="white"
-              borderRadius="2xl"
-              maxW="650px"
-              w="full"
-              p={6}
-              boxShadow="xl"
-            >
+      {isOpen && (
+        <Dialog.Root 
+        open={isOpen} 
+        onOpenChange={(open) => {
+          setIsOpen(open);
+        }}
+      >
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content
+            bg="white"
+            borderRadius="2xl"
+            maxW="650px"
+            w="full"
+            p={6}
+            boxShadow="xl"
+          >
               <Dialog.Header mb={3}>
                 <Dialog.Title
                   fontSize="xl"
@@ -104,11 +113,11 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                   Kuryerlar qo‘shish
                 </Dialog.Title>
                 <Dialog.CloseTrigger asChild>
-                  <CloseButton size="sm" />
+                  <CloseButton size="sm" onClick={resetAll} />
                 </Dialog.CloseTrigger>
               </Dialog.Header>
 
-              <Dialog.Body>
+              <Dialog.Body mb={6}>
                 <Box bg="white" borderRadius="md" p={4}>
                   <Flex gap={3} mb={4}>
                     <InputGroup startElement={<MdPerson color="#adb5bd" />}>
@@ -143,7 +152,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                     </InputGroup>
                   </Flex>
 
-                  <Flex gap={3} mb={4}>
+                  <Flex gap={3} mb={4} >
                     <InputGroup
                       flex={1}
                       startElement={<MdLocalShipping color="#adb5bd" />}
@@ -170,7 +179,14 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                           <Select.Indicator />
                         </Select.Trigger>
                         <Select.Positioner>
-                          <Select.Content>
+                          <Select.Content 
+                            marginTop="-160px"
+                            bg="white" 
+                            borderRadius="md" 
+                            border="1px solid" 
+                            borderColor="gray.200"
+                            maxHeight="200px"
+                          >
                             {transportTypes.items.map((item) => (
                               <Select.Item key={item.value} item={item}>
                                 {item.label}
@@ -233,7 +249,10 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                         <Select.Indicator />
                       </Select.Trigger>
                       <Select.Positioner>
-                        <Select.Content>
+                        <Select.Content
+                          overflowY="scroll"
+                          maxHeight="80px"
+                        >
                           {pazandalarCollection.items.map((item) => (
                             <Select.Item key={item.value} item={item}>
                               {item.label}
@@ -271,8 +290,8 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
               </Dialog.Footer>
             </Dialog.Content>
           </Dialog.Positioner>
-        </Portal>
       </Dialog.Root>
+      )}
     </>
   );
 };

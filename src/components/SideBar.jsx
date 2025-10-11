@@ -39,6 +39,8 @@ const SideBar = () => {
             return (
               <Button
                 key={item.label}
+                as={Link} // ✅ MUHIM O‘ZGARISH
+                to={item.to} // router link shu yerda ishlaydi
                 justifyContent="flex-start"
                 variant="ghost"
                 fontWeight="normal"
@@ -48,22 +50,12 @@ const SideBar = () => {
                 borderColor="primary.light"
                 bg={isActive ? "primary.light" : "transparent"}
                 color={isActive ? "white" : "black"}
+                leftIcon={item.icon} // ✅ iconni shunaqa joylashtirish to‘g‘riroq
                 _hover={{
                   bg: isActive ? "primary.light" : "gray.200",
                 }}
               >
-                <Link
-                  to={item.to}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    width: "100%",
-                    gap: "8px",
-                  }}
-                >
-                  {item.icon}
-                  {item.label}
-                </Link>
+                {item.label}
               </Button>
             );
           })}
@@ -79,8 +71,9 @@ const SideBar = () => {
           border="1px solid"
           borderColor="primary.light"
           _hover={{ bg: "primary.light", color: "white" }}
+          leftIcon={<FiLogOut />}
+          onClick={() => console.log("Logout clicked")}
         >
-          <FiLogOut />
           Chiqish
         </Button>
       </Box>

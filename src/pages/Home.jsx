@@ -21,16 +21,16 @@ const Home = () => {
 
   const tarifChart = useChart({
     data: [
-      { name: "Luxury", value: 189245, color: "#5654D4" },
-      { name: "Bepul", value: 120000, color: "#ED64A6" },
-      { name: "Standard", value: 100000, color: "#ED8936" },
-      { name: "Premium", value: 90800, color: "#4299E1" },
+      { name: "Luxury", value: 30003, color: "#5654D4" },
+      { name: "Bepul", value: 25100, color: "#ED64A6" },
+      { name: "Standard", value: 40003, color: "#ED8936" },
+      { name: "Premium", value: 40003, color: "#4299E1" },
     ],
   });
 
   const buyurtmaChart = useChart({
     data: [
-      { name: "Bekor qilindi", value: 600, color: "#F6AD55" },
+      { name: "Bekor qilindi", value: 700, color: "#F6AD55" },
       { name: "Yetkazildi", value: 1114, color: "#38A169" },
     ],
   });
@@ -131,10 +131,12 @@ const Home = () => {
               <Tooltip
                 cursor={false}
                 animationDuration={100}
+                
                 content={<Chart.Tooltip hideLabel />}
               />
               <Pie
                 isAnimationActive={true}
+                
                 data={tarifChart.data}
                 dataKey={tarifChart.key("value")}
               >
@@ -145,7 +147,7 @@ const Home = () => {
                   dataKey="name"
                 />
                 {tarifChart.data.map((item) => (
-                  <Cell key={item.name} fill={tarifChart.color(item.color)} />
+                  <Cell key={item.name}  fill={tarifChart.color(item.color)} />
                 ))}
               </Pie>
             </PieChart>

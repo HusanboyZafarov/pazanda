@@ -1,6 +1,15 @@
 import React, { useState } from "react";
-import { Box, Flex, Text, Button, Portal, Dialog } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  Portal,
+  Dialog,
+} from "@chakra-ui/react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import { toaster } from "@/components/ui/toaster";
+
 import { LuCalendarCheck2 } from "react-icons/lu";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { IoMdNotificationsOutline } from "react-icons/io";
@@ -10,6 +19,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const NotificationDialog = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(dayjs().format("HH:mm"));
   const [isMonthOpen, setIsMonthOpen] = useState(false);
@@ -25,13 +35,33 @@ const NotificationDialog = () => {
       .format("HH:mm");
     setSelectedTime(newTime);
   };
+  const handleSubmit = () => {
+    const id = "send-toast";
+
+    toaster.loading({
+      id,
+      title: "Yuborilmoqda...",
+      description: "Iltimos, kuting ",
+    });
+
+    setTimeout(() => {
+      toaster.update(id, {
+        title: "Muvaffaqiyatli yuborildi",
+        description: "Bildirishnoma muvaffaqiyatli jo'natildi.",
+        type: "success",
+        duration: 3000, 
+      });
+
+      setIsOpen(false);
+    }, 2000);
+  };
 
   const timeOptions = Array.from({ length: 24 }, (_, i) =>
     dayjs().hour(i).minute(0).format("HH:mm")
   );
 
   return (
-    <Dialog.Root>
+    <Dialog.Root open={isOpen} onOpenChange={(e) => setIsOpen(e.open)}>
       <Dialog.Trigger asChild>
         <Button
           size="sm"
@@ -85,6 +115,7 @@ const NotificationDialog = () => {
               </Box>
             </Box>
 
+            {/* Sana va vaqt */}
             <Flex
               gap={3}
               mb={6}
@@ -92,6 +123,7 @@ const NotificationDialog = () => {
               justify="space-between"
               width="100%"
             >
+              {/* Sana */}
               <Box position="relative">
                 <Flex
                   align="center"
@@ -153,6 +185,7 @@ const NotificationDialog = () => {
                 )}
               </Box>
 
+              {/* Vaqt */}
               <Box position="relative">
                 <Flex
                   align="center"
@@ -238,14 +271,16 @@ const NotificationDialog = () => {
               </Box>
             </Flex>
 
-            <Flex justify="flex-end" mt={"150px"}>
+            <Flex justify="flex-end" mt="150px">
               <Dialog.Footer>
                 <Button
                   bg="primary.light"
                   color="white"
                   _hover={{ bg: "green.500" }}
                   px={6}
-                  borderRadius="xl"
+                  borderRadius="md"
+                  onClick={handleSubmit}
+
                 >
                   Yuborish
                 </Button>

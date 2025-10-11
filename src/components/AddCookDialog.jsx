@@ -103,7 +103,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                   {step === "form" ? "Pazanda qo‘shish" : "Login parol..."}
                 </Dialog.Title>
                 <Dialog.CloseTrigger asChild>
-                  <CloseButton size="sm" />
+                  <CloseButton size="sm" onClick={resetAll} />
                 </Dialog.CloseTrigger>
               </Dialog.Header>
 
@@ -206,7 +206,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                           }
                           bg="white"
                           borderColor="gray.400"
-                          type="tel"
+                          type="998 __ ___‑__‑__"
                           _focus={{
                             borderColor: "primary.light",
                             boxShadow: "0 0 0 1px #379570",
