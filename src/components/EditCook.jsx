@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   Portal,
@@ -12,11 +12,49 @@ import {
 import { RxCross2 } from "react-icons/rx";
 
 const EditCook = ({ isOpen, onClose, cook, onSave }) => {
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    name: "",
+    lastname: "",
+    phone: "",
+    rating: "",
+    region: "",
+    tariff: "",
+  });
 
+  // 🔹 Eski ma’lumotlarni inputlarga joylash
   useEffect(() => {
-    if (cook) setFormData(cook);
-  }, [cook]);
+    // Dialog ochilganda va cook o'zgarganda formani yangilash
+    if (isOpen && cook) {
+      // Debug: cook obyektini ko'rsatish
+      console.log("EditCook - cook obyekti:", cook);
+      
+      // full_name ni to'g'ri ajratish - birinchi qism ism, qolgani familiya
+      const nameParts = cook.full_name?.split(" ") || [];
+      const name = nameParts[0] || "";
+      const lastname = nameParts.slice(1).join(" ") || "";
+
+      setFormData({
+        name,
+        lastname,
+        phone: cook.phone || cook.phone_number || cook.user_phone || "",
+        rating: cook.rating || cook.rating_value || String(cook.rating || ""),
+        // Backenddan kelgan ma'lumotlar address yoki region bo'lishi mumkin
+        region: cook.region || cook.address || cook.location || "",
+        // Backenddan kelgan ma'lumotlar tarif yoki tariff bo'lishi mumkin
+        tariff: cook.tarif || cook.tariff || cook.pricing || "",
+      });
+    } else if (!isOpen) {
+      // Dialog yopilganda formani tozalash
+      setFormData({
+        name: "",
+        lastname: "",
+        phone: "",
+        rating: "",
+        region: "",
+        tariff: "",
+      });
+    }
+  }, [isOpen, cook]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,9 +62,19 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
   };
 
   const handleSave = () => {
-    onSave(formData);
+    const payload = {
+      full_name: `${formData.name} ${formData.lastname}`.trim(),
+      phone: formData.phone,
+      rating: formData.rating,
+      // API da `address` maydoni bor, biz hududni shu yerga yuboramiz
+      address: formData.region,
+      // Qolgan required bo'lmagan maydonlar backendda default qoladi
+    };
+
+    onSave(payload);
     onClose();
   };
+  
 
   if (!cook) return null;
 
@@ -51,67 +99,62 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
             <Dialog.Body>
               <Flex gap={6}>
                 <Box flex="1" display="flex" flexDirection="column" gap={4}>
-                  {[
-                    { name: "name", label: "Ism" },
-                    { name: "lastname", label: "Familiya" },
-                    { name: "meals", label: "Ovqat soni" },
-                    { name: "rating", label: "Reyting" },
-                  ].map(({ name, label }) => (
-                    <Box key={name}>
-                      <Text mb={1} fontSize="sm" fontWeight="medium">
-                        {label}
-                      </Text>
-                      <Input
-                        name={name}
-                        value={formData[name] || ""}
-                        onChange={handleChange}
-                        placeholder={label}
-                      />
-                    </Box>
-                  ))}
+                  <Box>
+                    <Text mb={1}>Ism</Text>
+                    <Input
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
+                  </Box>
+
+                  <Box>
+                    <Text mb={1}>Familiya</Text>
+                    <Input
+                      name="lastname"
+                      value={formData.lastname}
+                      onChange={handleChange}
+                    />
+                  </Box>
+
+                  <Box>
+                    <Text mb={1}>Reyting</Text>
+                    <Input
+                      name="rating"
+                      value={formData.rating}
+                      onChange={handleChange}
+                    />
+                  </Box>
                 </Box>
 
+                {/* O‘ng tomoni */}
                 <Box flex="1" display="flex" flexDirection="column" gap={4}>
-                  {[
-                    { name: "region", label: "Hudud" },
-                    { name: "tariff", label: "Tarif" },
-                    { name: "phone", label: "Telefon raqami" },
-                  ].map(({ name, label }) => (
-                    <Box key={name}>
-                      <Text mb={1} fontSize="sm" fontWeight="medium">
-                        {label}
-                      </Text>
-                      <Input
-                        name={name}
-                        value={formData[name] || ""}
-                        onChange={handleChange}
-                        placeholder={label}
-                      />
-                    </Box>
-                  ))}
-{/* 
                   <Box>
-                    <Text mb={1} fontSize="sm" fontWeight="medium">
-                      Lid holati
-                    </Text>
-                    <Switch.Root
-                      isChecked={formData.Lid === "True"}
-                      onCheckedChange={(checked) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          Lid: checked ? "True" : "False",
-                        }))
-                      }
-                    >
-                      <Switch.HiddenInput />
-                      <Switch.Control />
-                      <Switch.Label ml={2}>
-                        {formData.Lid === "True"
-                          ? "Lid holati yoqilgan"
-                          : "Yoqilgan emas"}
-                      </Switch.Label>
-                    </Switch.Root>
-                  </Box> */}
+                    <Text mb={1}>Telefon raqami</Text>
+                    <Input
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+                  </Box>
+
+                  <Box>
+                    <Text mb={1}>Hudud</Text>
+                    <Input
+                      name="region"
+                      value={formData.region}
+                      onChange={handleChange}
+                    />
+                  </Box>
+
+                  <Box>
+                    <Text mb={1}>Tarif</Text>
+                    <Input
+                      name="tariff"
+                      value={formData.tariff}
+                      onChange={handleChange}
+                    />
+                  </Box>
                 </Box>
               </Flex>
             </Dialog.Body>
@@ -129,7 +172,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
               </Button>
             </Dialog.Footer>
 
-            <Dialog.CloseTrigger asChild onClick={onClose}>
+            <Dialog.CloseTrigger asChild>
               <Box
                 as="button"
                 bg="gray.100"
@@ -139,6 +182,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
                 position="absolute"
                 right="2"
                 top="2"
+                onClick={onClose}
               >
                 <RxCross2 size={18} />
               </Box>

@@ -10,11 +10,13 @@ import {
 } from "@chakra-ui/react";
 import { LuUser, LuLock, LuEye, LuEyeOff } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const { login: doLogin, loading, } = useAuth();
   const navigate = useNavigate();
 
   const isFilled = login.trim() !== "" && password.trim() !== "";
@@ -65,7 +67,7 @@ const Login = () => {
           <Input
             value={login}
             onChange={(e) => setLogin(e.target.value)}
-            placeholder="Spencer"
+            placeholder="Telefon yoki login"
             fontFamily="systemUiM"
             borderRadius="xl"
             border="1px solid"
@@ -123,12 +125,16 @@ const Login = () => {
           _hover={{ bg: isFilled ? "primary.light" : "#BBBBBB" }}
           fontFamily="systemUiB"
           rounded="xl"
-          cursor={!isFilled ? "not-allowed" : "pointer"}
-          onClick={() => {
-              navigate("home");
+          cursor={!isFilled || loading ? "not-allowed" : "pointer"}
+          isDisabled={!isFilled || loading}
+          onClick={async () => {
+            const res = await doLogin({ phone: login, password });
+            if (res?.success) {
+              navigate("/home");
+            }
           }}
         >
-          Kirish
+          {loading ? "Yuklanmoqda..." : "Kirish"}
         </Button>
       </Box>
     </Box>

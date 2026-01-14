@@ -19,13 +19,12 @@ import {
   MdLock,
   MdLogin,
 } from "react-icons/md";
-import SelectComponent from "./SelectComponent";
 
 const AddCookDialog = ({ handleAddCook }) => {
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
-    region: "andijon",
+    address: "andijon", // Region address sifatida
     phone: "",
   });
 
@@ -34,36 +33,48 @@ const AddCookDialog = ({ handleAddCook }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const resetAll = () => {
-    setFormData({ name: "", surname: "", region: "andijon", phone: "" });
+    setFormData({ 
+      name: "", 
+      surname: "", 
+      address: "andijon", 
+      phone: "" 
+    });
     setLoginData({ login: "", password: "" });
     setStep("form");
     setIsOpen(false);
   };
 
   const handleFormSubmit = () => {
-    if (!formData.name || !formData.surname || !formData.phone) return;
+    if (!formData.name || !formData.surname || !formData.phone || !formData.address) return;
     setStep("login");
   };
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = async () => {
     if (!loginData.login || !loginData.password) return;
 
     const newCook = {
-      name: `${formData.name} ${formData.surname}`,
+      full_name: `${formData.name} ${formData.surname}`,
+      address: formData.address, // Region address sifatida
+      region: formData.address, // Agar backendda region ham kerak bo'lsa
+      phone: formData.phone,
+      login: loginData.login,
+      password: loginData.password,
+      // Qo'shimcha default qiymatlar
       meals: "0/0",
       rating: "0.0",
-      region: formData.region,
       tariff: "Bepul",
       status: "Offline",
       Lid: "False",
       date: new Date().toLocaleDateString("en-GB"),
-      phone: formData.phone,
-      login: loginData.login,
-      password: loginData.password,
     };
 
-    handleAddCook(newCook);
-    resetAll();
+    try {
+      await handleAddCook(newCook);
+      resetAll();
+    } catch (error) {
+      // Xatolik bo'lsa, dialog ochiq qoladi
+      console.error("Pazanda qo'shishda xatolik:", error);
+    }
   };
 
   return (
@@ -100,7 +111,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                   fontWeight="bold"
                   fontFamily="systemUiB"
                 >
-                  {step === "form" ? "Pazanda qo‘shish" : "Login parol..."}
+                  {step === "form" ? "Pazanda qo'shish" : "Login parol..."}
                 </Dialog.Title>
                 <Dialog.CloseTrigger asChild>
                   <CloseButton size="sm" onClick={resetAll} />
@@ -149,21 +160,20 @@ const AddCookDialog = ({ handleAddCook }) => {
                       </InputGroup>
                     </Flex>
 
-                    <Flex gap={3}>
+                    <Flex gap={3} mb={4}>
                       <InputGroup
                         flex={1}
                         startElement={<MdLocationOn color="#adb5bd" />}
                       >
                         <Select.Root
-                          selected={(item) => item.value === formData.region}
+                          selected={(item) => item.value === formData.address}
                           onSelect={(item) =>
                             setFormData((prev) => ({
                               ...prev,
-                              region: item.value,
+                              address: item.value,
                             }))
                           }
                           collection={regions}
-                          onChange={(e) => console.log(e.target.value)}
                         >
                           <Select.HiddenSelect />
                           <Select.Trigger
@@ -176,7 +186,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                               boxShadow: "0 0 0 1px #379570",
                             }}
                           >
-                            <Select.ValueText placeholder="Hududni tanlang" />
+                            <Select.ValueText placeholder="Manzil (Hudud)" />
                             <Select.Indicator />
                           </Select.Trigger>
                           <Select.Positioner>
@@ -196,7 +206,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                         startElement={<MdPhone color="#adb5bd" />}
                       >
                         <Input
-                          placeholder="Tel"
+                          placeholder="Telefon raqam"
                           value={formData.phone}
                           onChange={(e) =>
                             setFormData((prev) => ({
@@ -206,7 +216,6 @@ const AddCookDialog = ({ handleAddCook }) => {
                           }
                           bg="white"
                           borderColor="gray.400"
-                          type="998 __ ___‑__‑__"
                           _focus={{
                             borderColor: "primary.light",
                             boxShadow: "0 0 0 1px #379570",
@@ -276,7 +285,6 @@ const AddCookDialog = ({ handleAddCook }) => {
                     color="white"
                     _hover={{ bg: "green.600" }}
                     px={6}
-                    borderRadius="xl"
                     onClick={
                       step === "form" ? handleFormSubmit : handleLoginSubmit
                     }
@@ -286,7 +294,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                 </Flex>
               </Dialog.Footer>
             </Dialog.Content>
-          </Dialog.Positioner>
+          </Dialog.Positioner>  
         </Portal>
       </Dialog.Root>
     </>
@@ -307,7 +315,7 @@ const regions = createListCollection({
     { label: "Guliston", value: "guliston" },
     { label: "Jizzax", value: "jizzax" },
     { label: "Navoiy", value: "navoiy" },
-    { label: "Qo‘qon", value: "qoqon" },
+    { label: "Qo'qon", value: "qoqon" },
   ],
 });
 

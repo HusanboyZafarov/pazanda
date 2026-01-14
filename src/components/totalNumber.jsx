@@ -1,19 +1,19 @@
 import { Box, Flex, Icon, Text, SimpleGrid } from "@chakra-ui/react";
 import { FaUsers } from "react-icons/fa";
 
-const TotalNumber = () => {
+const TotalNumber = ({ userCount = 0, cookCount = 0, courierCount = 0 }) => {
   const cards = [
     {
       title: "Foydalanuvchilar soni",
-      count: 0,
+      count: userCount,
     },
     {
       title: "Umumiy pazanda soni",
-      count: 0,
+      count: cookCount,
     },
     {
       title: "Umumiy kuryerlar soni",
-      count: 0,
+      count: courierCount,
     },
   ];
 

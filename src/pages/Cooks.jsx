@@ -1,47 +1,59 @@
 import React, { useState } from "react";
-import { Box, Flex, Text, Button, Badge, Table } from "@chakra-ui/react";
-import { FaClipboardList } from "react-icons/fa";
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  Spinner,
+  Center,
+  Table,
+  Badge,
+} from "@chakra-ui/react";
 import { GoTrash } from "react-icons/go";
-import { CiStar } from "react-icons/ci";
 import { FiEdit3 } from "react-icons/fi";
+import { FaClipboardList } from "react-icons/fa";
+import { CiStar } from "react-icons/ci";
 
 import NotificationDialog from "../components/NotificationDialog";
-import Delete from "../components/Delete";
 import AddCookDialog from "../components/AddCookDialog";
 import EditCook from "../components/EditCook";
+import Delete from "../components/Delete";
 
-const Cooks = ({ cooks, setCooks }) => {
-  const [openIndex, setOpenIndex] = useState(null); 
-  const [editingIndex, setEditingIndex] = useState(null);
+import useCooks from "../hooks/useCooks";
+import { useCooksLid } from "../hooks/useCooksLid";
+
+const Cooks = () => {
+  const { cooks, loading, error, addCook, editCook, deleteCook } = useCooks();
+  const { cooksLid } = useCooksLid();
   const [showOnlyLids, setShowOnlyLids] = useState(false);
+  const [editingCook, setEditingCook] = useState(null);
+  const [deletingCook, setDeletingCook] = useState(null);
 
-  const handleAddCook = (newCook) => {
-    setCooks((prev) => [...prev, newCook]);
-  };
+  const displayedCooks = showOnlyLids ? cooksLid : cooks;
 
-  const handleDelete = () => {
-    if (openIndex !== null) {
-      const updated = cooks.filter((_, i) => i !== openIndex);
-      setCooks(updated);
-      setOpenIndex(null);
-    }
-  };
 
-  const handleEditSave = (updatedCook) => {
-    const updated = cooks.map((c, i) => (i === editingIndex ? updatedCook : c));
-    setCooks(updated);
-    setEditingIndex(null);
-  };
 
-  const filteredCooks = showOnlyLids
-    ? cooks.filter((cook) => cook.Lid === "True")
-    : cooks;
+  if (loading) {
+    return (
+      <Center h="100vh">
+        <Spinner size="xl" color="green.500" />
+      </Center>
+    );
+  }
+
+  if (error) {
+    return (
+      <Center h="100vh">
+        <Text color="red.500">Xatolik: {error}</Text>
+      </Center>
+    );
+  }
 
   return (
     <Box p={4} bg="white" borderRadius="2xl" height="100vh">
       <Flex justify="space-between" align="center" mb={4}>
-        <Text fontSize="xl" fontWeight="bold" fontFamily="systemUiB">
-          {showOnlyLids ? "Murojaatlar ro'yxati" : "Pazandalar"}
+        <Text fontSize="xl" fontWeight="bold">
+          Pazandalar
         </Text>
 
         <Flex gap={2}>
@@ -50,15 +62,17 @@ const Cooks = ({ cooks, setCooks }) => {
             size="sm"
             variant="outline"
             colorScheme="green"
-            bg={showOnlyLids ? "primary.light" : "#B5D8CA80"}
+            bg={showOnlyLids ? "green.400" : "#B5D8CA80"}
             color={showOnlyLids ? "white" : "black"}
-            _hover={{ bg: "primary.light", color: "white" }}
+            _hover={{ bg: "green.500", color: "white" }}
             onClick={() => setShowOnlyLids(!showOnlyLids)}
           >
-            <Box as="span">Lidlar</Box>
+            <Box as="span" mr={2}>
+              Lidlar
+            </Box>
             <FaClipboardList />
           </Button>
-          <AddCookDialog handleAddCook={handleAddCook} />
+          <AddCookDialog handleAddCook={addCook} />
         </Flex>
       </Flex>
 
@@ -66,135 +80,79 @@ const Cooks = ({ cooks, setCooks }) => {
         <Table.Root size="sm" variant="line">
           <Table.Header bg="white">
             <Table.Row>
-              {showOnlyLids ? (
-                <>
-                  <Table.ColumnHeader>Pazanda ismi</Table.ColumnHeader>
-                  <Table.ColumnHeader>Familiyasi</Table.ColumnHeader>
-                  <Table.ColumnHeader>Hudud</Table.ColumnHeader>
-                  <Table.ColumnHeader>Tel no'mer</Table.ColumnHeader>
-                  <Table.ColumnHeader>O'zgarish</Table.ColumnHeader>
-                </>
-              ) : (
-                <>
-                  <Table.ColumnHeader>Pazanda ismi</Table.ColumnHeader>
-                  <Table.ColumnHeader>Ovqat soni</Table.ColumnHeader>
-                  <Table.ColumnHeader>Reyting</Table.ColumnHeader>
-                  <Table.ColumnHeader>Hudud</Table.ColumnHeader>
-                  <Table.ColumnHeader>Tarif</Table.ColumnHeader>
-                  <Table.ColumnHeader>Status</Table.ColumnHeader>
-                  <Table.ColumnHeader>Ro'yxat sanasi</Table.ColumnHeader>
-                  <Table.ColumnHeader>Tel no'mer</Table.ColumnHeader>
-                  <Table.ColumnHeader>O'zgarish</Table.ColumnHeader>
-                </>
-              )}
+              <Table.ColumnHeader>Pazanda ismi</Table.ColumnHeader>
+              <Table.ColumnHeader>Ovqat soni</Table.ColumnHeader>
+              <Table.ColumnHeader>Reyting</Table.ColumnHeader>
+              <Table.ColumnHeader>Hudud</Table.ColumnHeader>
+              <Table.ColumnHeader>Tarif</Table.ColumnHeader>
+              <Table.ColumnHeader>Status</Table.ColumnHeader>
+              <Table.ColumnHeader>Telefon</Table.ColumnHeader>
+              <Table.ColumnHeader>Amal</Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
 
           <Table.Body>
-            {filteredCooks.map((cook, index) => (
-              <Table.Row key={index} _hover={{ bg: "gray.100" }}>
-                {showOnlyLids ? (
-                  <>
-                    <Table.Cell>{cook.name}</Table.Cell>
-                    <Table.Cell>{cook.lastname}</Table.Cell>
-                    <Table.Cell>{cook.region}</Table.Cell>
-                    <Table.Cell>{cook.phone}</Table.Cell>
-                    <Table.Cell>
-                      <Flex gap={2}>
-                        <Button
-                          size="xs"
-                          borderRadius="xl"
-                          variant="outline"
-                          colorScheme="green"
-                          bg="#B5D8CA80"
-                          onClick={() => setEditingIndex(index)}
-                          _hover={{ bg: "primary.light", color: "white" }}
-                        >
-                          <FiEdit3 style={{ width: "20px" }} />
-                        </Button>
-                        <Button
-                          size="xs"
-                          borderRadius="xl"
-                          variant="outline"
-                          colorScheme="green"
-                          bg="#B5D8CA80"
-                          onClick={() => setOpenIndex(index)}
-                          _hover={{ bg: "primary.light", color: "white" }}
-                        >
-                          <GoTrash style={{ width: "20px" }} />
-                        </Button>
-                      </Flex>
-                    </Table.Cell>
-                  </>
-                ) : (
-                  <>
-                    <Table.Cell>{cook.name}</Table.Cell>
-                    <Table.Cell>{cook.meals}</Table.Cell>
-                    <Table.Cell>
-                      <Flex align="center" gap={1}>
-                        <CiStar />
-                        {cook.rating}
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell>{cook.region}</Table.Cell>
-                    <Table.Cell>{cook.tariff}</Table.Cell>
-                    <Table.Cell>
-                      <Badge
-                        colorScheme={
-                          cook.status === "Online" ? "green" : "gray"
-                        }
-                      >
-                        {cook.status}
-                      </Badge>
-                    </Table.Cell>
-                    <Table.Cell>{cook.date}</Table.Cell>
-                    <Table.Cell>{cook.phone}</Table.Cell>
-                    <Table.Cell>
-                      <Flex gap={2}>
-                        <Button
-                          size="xs"
-                          borderRadius="xl"
-                          variant="outline"
-                          colorScheme="green"
-                          bg="#B5D8CA80"
-                          onClick={() => setEditingIndex(index)}
-                          _hover={{ bg: "primary.light", color: "white" }}
-                        >
-                          <FiEdit3 style={{ width: "20px" }} />
-                        </Button>
-                        <Button
-                          size="xs"
-                          borderRadius="xl"
-                          variant="outline"
-                          colorScheme="green"
-                          bg="#B5D8CA80"
-                          onClick={() => setOpenIndex(index)}
-                          _hover={{ bg: "primary.light", color: "white" }}
-                        >
-                          <GoTrash style={{ width: "20px" }} />
-                        </Button>
-                      </Flex>
-                    </Table.Cell>
-                  </>
-                )}
+            {displayedCooks.map((cook, index) => (
+              <Table.Row key={cook.user || cook.id || `cook-${index}`} _hover={{ bg: "gray.100" }}>
+                <Table.Cell>{cook.full_name}</Table.Cell>
+                <Table.Cell>{cook.meal_count ?? "-"}</Table.Cell>
+                <Table.Cell>
+                  <Flex align="center" gap={1}>
+                    <CiStar />
+                    {cook.rating ?? "0"}
+                  </Flex>
+                </Table.Cell>
+                <Table.Cell>{cook.region}</Table.Cell>
+                <Table.Cell>{cook.tarif}</Table.Cell>
+                <Table.Cell>
+                  <Badge colorScheme={cook.status === "Online" ? "green" : "gray"}>
+                    {cook.status}
+                  </Badge>
+                </Table.Cell>
+                <Table.Cell>{cook.phone_number}</Table.Cell>
+                <Table.Cell>
+                  <Flex gap={2}>
+                    <Button
+                      size="xs"
+                      borderRadius="xl"
+                      variant="outline"
+                      onClick={() => setEditingCook(cook)}
+                    >
+                      <FiEdit3 />
+                    </Button>
+                    <Button
+                      size="xs"
+                      borderRadius="xl"
+                      variant="outline"
+                      colorScheme="red"
+                      onClick={() => setDeletingCook(cook)}
+                    >
+                      <GoTrash />
+                    </Button>
+                  </Flex>
+                </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table.Root>
       </Box>
 
-      <Delete
-        isOpen={openIndex !== null}
-        onClose={() => setOpenIndex(null)}
-        onConfirm={handleDelete}
-      />
+      <Delete isOpen={!!deletingCook} onClose={() => setDeletingCook(null)} onConfirm={async () => { await deleteCook(deletingCook.user); setDeletingCook(); }} /> 
 
       <EditCook
-        isOpen={editingIndex !== null}
-        onClose={() => setEditingIndex(null)}
-        cook={editingIndex !== null ? cooks[editingIndex] : null}
-        onSave={handleEditSave}
+        isOpen={!!editingCook}
+        cook={editingCook}
+        onSave={async (data) => {
+          try {
+            await editCook(editingCook.user, data);
+            setEditingCook(null);
+          } catch (error) {
+            console.error("Pazandani yangilashda xatolik:", error);
+          }
+        }}
+        onClose={() => setEditingCook(null)}
       />
+
     </Box>
   );
 };

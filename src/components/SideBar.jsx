@@ -39,8 +39,8 @@ const SideBar = () => {
             return (
               <Button
                 key={item.label}
-                as={Link} // ✅ MUHIM O‘ZGARISH
-                to={item.to} // router link shu yerda ishlaydi
+                as={Link}
+                to={item.to}
                 justifyContent="flex-start"
                 variant="ghost"
                 fontWeight="normal"
