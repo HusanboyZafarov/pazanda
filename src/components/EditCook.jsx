@@ -31,7 +31,7 @@ const PhoneInput = ({ value, onChange }) => {
       paddingLeft="40px"
       _focus={{
         borderColor: "primary.light",
-        boxShadow: "0 0 0 1px #379570",
+        boxShadow: "0 0 0 1px token(colors.primary.light)",
       }}
     />
   );
@@ -100,7 +100,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
       <Portal>
         <Dialog.Positioner>
           <Dialog.Content
-            bg="#F9FAFB"
+            bg="gray.100"
             borderRadius="xl"
             maxW="600px"
             w="full"
@@ -208,7 +208,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
               </Button>
               <Button
                 bg="primary.light"
-                _hover={{ bg: "green.600" }}
+                _hover={{ bg: "primary.dark" }}
                 onClick={handleSave}
               >
                 Saqlash

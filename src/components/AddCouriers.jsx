@@ -30,10 +30,9 @@ const PhoneInput = ({ value, onChange }) => {
       inputMode="numeric"
       bg="white"
       borderColor="gray.400"
-      paddingLeft="40px"
       _focus={{
         borderColor: "primary.light",
-        boxShadow: "0 0 0 1px #379570",
+        boxShadow: "0 0 0 1px token(colors.primary.light)",
       }}
     />
   );
@@ -192,7 +191,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
       <Button
         size="sm"
         variant="outline"
-        bg="#B5D8CA80"
+        bg="primary.white"
         _hover={{ bg: "primary.light", color: "white" }}
         onClick={() => setIsOpen(true)}
       >
@@ -232,7 +231,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
               <Dialog.Body mb={12}>
                 <Box bg="white" borderRadius="md" p={4}>
                   <Flex gap={3} mb={4}>
-                    <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                    <InputGroup startElement={<MdPerson color="gray.500" />}>
                       <Input
                         placeholder="Ism"
                         value={formData.name}
@@ -243,11 +242,11 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                         borderColor="gray.400"
                         _focus={{
                           borderColor: "primary.light",
-                          boxShadow: "0 0 0 1px #379570",
+                          boxShadow: "0 0 0 1px token(colors.primary.light)",
                         }}
                       />
                     </InputGroup>
-                    <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                    <InputGroup startElement={<MdPerson color="gray.500" />}>
                       <Input
                         placeholder="Familiya"
                         value={formData.surname}
@@ -258,7 +257,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                         borderColor="gray.400"
                         _focus={{
                           borderColor: "primary.light",
-                          boxShadow: "0 0 0 1px #379570",
+                          boxShadow: "0 0 0 1px token(colors.primary.light)",
                         }}
                       />
                     </InputGroup>
@@ -267,7 +266,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                   <Flex gap={3} mb={4} >
                     <InputGroup
                       flex={1}
-                      startElement={<MdLocalShipping color="#adb5bd" />}
+                      startElement={<MdLocalShipping color="gray.500" />}
                     >
                       <Select.Root
                         value={formData.transport ? [formData.transport] : []}
@@ -285,7 +284,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                           paddingLeft="30px"
                           _focusWithin={{
                             borderColor: "primary.light",
-                            boxShadow: "0 0 0 1px #379570",
+                            boxShadow: "0 0 0 1px token(colors.primary.light)",
                           }}
                         >
                           <Select.ValueText placeholder="Transport turini tanlang" />
@@ -312,7 +311,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                     </InputGroup>
 
                     
-                    <InputGroup flex={1} startElement={<MdPhone color="#adb5bd" />}>
+                    <InputGroup flex={1} startElement={<MdPhone color="gray.500" />}>
                       <PhoneInput 
                         value={formData.phone}
                         onChange={(value) => setFormData({ ...formData, phone: value })}
@@ -321,7 +320,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
 
                   </Flex>
 
-                  <InputGroup startElement={<MdLock color="#adb5bd" />} mb={4}>
+                  <InputGroup startElement={<MdLock color="gray.500" />} mb={4}>
                     <Input
                       placeholder="Parol"
                       type="password"
@@ -333,12 +332,12 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                       borderColor="gray.400"
                       _focus={{
                         borderColor: "primary.light",
-                        boxShadow: "0 0 0 1px #379570",
+                        boxShadow: "0 0 0 1px token(colors.primary.light)",
                       }}
                     />
                   </InputGroup>
 
-                  <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                  <InputGroup startElement={<MdPerson color="gray.500" />}>
                     {pazandalarCollection.items.length > 0 ? (
                       <Select.Root
                         value={formData.bazars ? [formData.bazars] : []}
@@ -357,7 +356,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                           paddingLeft="30px"
                           _focusWithin={{
                             borderColor: "primary.light",
-                            boxShadow: "0 0 0 1px #379570",
+                            boxShadow: "0 0 0 1px token(colors.primary.light)",
                           }}
                         >
                           <Select.ValueText
@@ -403,7 +402,8 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                     variant="ghost"
                     color="gray.600"
                     _hover={{ color: "primary.light" }}
-                    border="1px solid #B5D8CA"
+                    border="1px solid"
+                    borderColor="gray.400"
                     onClick={resetAll}
                   >
                     Bekor qilish
@@ -411,7 +411,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                   <Button
                     bg="primary.light"
                     color="white"
-                    _hover={{ bg: "green.600" }}
+                    _hover={{ bg: "primary.dark" }}
                     px={6}
                     onClick={handleSubmit}
                     isLoading={isSubmitting}

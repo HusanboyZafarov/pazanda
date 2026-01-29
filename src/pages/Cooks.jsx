@@ -62,9 +62,9 @@ const Cooks = () => {
             size="sm"
             variant="outline"
             colorScheme="green"
-            bg={showOnlyLids ? "green.400" : "#B5D8CA80"}
+            bg={showOnlyLids ? "primary.light" : "secondary.100"}
             color={showOnlyLids ? "white" : "black"}
-            _hover={{ bg: "green.500", color: "white" }}
+            _hover={{ bg: "primary.light", color: "white" }}
             onClick={() => setShowOnlyLids(!showOnlyLids)}
           >
             <Box as="span" mr={2}>
@@ -115,16 +115,20 @@ const Cooks = () => {
                     <Button
                       size="xs"
                       borderRadius="xl"
+                      bg="#B5D8CA80"
                       variant="outline"
                       onClick={() => setEditingCook(cook)}
+                      _hover={{ bg: "primary.light", color: "white" }}
                     >
                       <FiEdit3 />
                     </Button>
                     <Button
                       size="xs"
                       borderRadius="xl"
+                      bg="#B5D8CA80"
                       variant="outline"
                       colorScheme="red"
+                      _hover={{ bg: "primary.red", color: "white" }}
                       onClick={() => setDeletingCook(cook)}
                     >
                       <GoTrash />

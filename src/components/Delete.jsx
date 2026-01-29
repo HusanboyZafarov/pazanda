@@ -8,7 +8,7 @@ const Delete = ({ isOpen, onClose, onConfirm }) => {
       <Portal>
         <Dialog.Positioner>
           <Dialog.Content
-            bg="#F9FAFB"
+            bg="gray.100"
             borderRadius="xl"
             maxW="400px"
             height="300px"
@@ -27,8 +27,8 @@ const Delete = ({ isOpen, onClose, onConfirm }) => {
                 Yo‘q
               </Button>
               <Button
-                bg="red.500"
-                _hover={{ bg: "red.700" }}
+                bg="error"
+                _hover={{ bg: "error" }}
                 onClick={onConfirm}
               >
                 Ha

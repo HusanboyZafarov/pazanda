@@ -30,7 +30,7 @@ const Home = () => {
   }, [dashboard]);
   const buyurtmaChart = useChart({ data: tariffPie });
 
-  const [periodType, setPeriodType] = useState("haftalik");
+  const [periodType, setPeriodType] = useState("Haftalik");
 
   const getISOWeekKey = (date) => {
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -46,7 +46,7 @@ const Home = () => {
 
   const aggregateIncome = useCallback((periods, type) => {
     const groups = new Map();
-    const getKey = (d) => (type === "yillik" ? getYearKey(d) : type === "oylik" ? getMonthKey(d) : getISOWeekKey(d));
+    const getKey = (d) => (type === "Yillik" ? getYearKey(d) : type === "Oylik" ? getMonthKey(d) : getISOWeekKey(d));
     periods.forEach((p) => {
       const d = new Date(p.period);
       const key = getKey(d);

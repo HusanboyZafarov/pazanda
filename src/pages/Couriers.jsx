@@ -90,7 +90,7 @@ const Couriers = () => {
             size="sm"
             variant="outline"
             colorScheme="green"
-            bg={showOnlyLids ? "primary.light" : "#B5D8CA80"}
+            bg={showOnlyLids ? "primary.light" : "primary.white"}
             color={showOnlyLids ? "white" : "black"}
             _hover={{ bg: "primary.light", color: "white" }}
             onClick={() => setShowOnlyLids(!showOnlyLids)}
@@ -150,7 +150,7 @@ const Couriers = () => {
                       colorScheme="green"
                       bg="#B5D8CA80"
                       onClick={() => setDeletingCourier(courier)}
-                      _hover={{ bg: "primary.light", color: "white" }}
+                      _hover={{ bg: "primary.red", color: "white" }}
                     >
                       <GoTrash style={{ width: "20px" }} />
                     </Button>

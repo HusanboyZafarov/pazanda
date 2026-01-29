@@ -107,7 +107,7 @@ const Users = () => {
               borderColor="gray.400"
               _focus={{
                 borderColor: "primary.light",
-                boxShadow: "0 0 0 1px #379570",
+                boxShadow: "0 0 0 1px token(colors.primary.light)",
               }}
             />
           </InputGroup>
@@ -126,7 +126,7 @@ const Users = () => {
                 paddingLeft="30px"
                 _focusWithin={{
                   borderColor: "primary.light",
-                  boxShadow: "0 0 0 1px #379570",
+                  boxShadow: "0 0 0 1px token(colors.primary.light)",
                   zIndex: 1,
                 }}
               >
@@ -175,9 +175,9 @@ const Users = () => {
               filteredAndSortedUsers.map((user) => (
               <Table.Row
                 key={user.user_id}
-                bg={!user.is_active ? "red.400" : "white"}
+                bg={!user.is_active ? "primary.red" : "white"}
                 color={!user.is_active ? "white" : "black"}
-                _hover={{ bg: !user.is_active ? "red.500" : "gray.100" }}
+                _hover={{ bg: !user.is_active ? "primary.red" : "gray.100" }}
               >
                 <Table.Cell>{user.full_name || "-"}</Table.Cell>
                 <Table.Cell>{formatDate(user.date_joined)}</Table.Cell>

@@ -66,7 +66,7 @@ const NotificationDialog = () => {
         <Button
           size="sm"
           variant="outline"
-          bg="#B5D8CA80"
+          bg="primary.white"
           _hover={{ bg: "primary.light", color: "white" }}
         >
           <IoMdNotificationsOutline />
@@ -78,10 +78,10 @@ const NotificationDialog = () => {
         <Dialog.Backdrop />
         <Dialog.Positioner>
           <Dialog.Content
-            bg="#F9FAFB"
+            bg="primary.white"
             borderRadius="xl"
             maxW="550px"
-            height="500px"
+            height="420px"
             w="full"
             p={6}
             boxShadow="lg"
@@ -104,7 +104,7 @@ const NotificationDialog = () => {
                 </Dialog.CloseTrigger>
               </Flex>
 
-              <Box mb={4}>
+              {/* <Box mb={4}>
                 <Text fontWeight="bold" fontSize="sm">
                   Lorem ipsum dolor sit amet.
                 </Text>
@@ -112,7 +112,7 @@ const NotificationDialog = () => {
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
                   do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                 </Text>
-              </Box>
+              </Box> */}
             </Box>
 
             {/* Sana va vaqt */}
@@ -276,7 +276,7 @@ const NotificationDialog = () => {
                 <Button
                   bg="primary.light"
                   color="white"
-                  _hover={{ bg: "green.500" }}
+                  _hover={{ bg: "primary.dark" }}
                   px={6}
                   borderRadius="md"
                   onClick={handleSubmit}

@@ -33,7 +33,7 @@ const PhoneInput = ({ value, onChange }) => {
       paddingLeft="40px"
       _focus={{
         borderColor: "primary.light",
-        boxShadow: "0 0 0 1px #379570",
+        boxShadow: "0 0 0 1px token(colors.primary.light)",
       }}
     />
   );
@@ -130,7 +130,7 @@ const handleSave = () => {
       <Portal>
         <Dialog.Positioner>
           <Dialog.Content
-            bg="#F9FAFB"
+            bg="gray.100"
             borderRadius="xl"
             maxW="600px"
             w="full"
@@ -150,7 +150,7 @@ const handleSave = () => {
                     <Text mb={1} fontSize="sm" fontWeight="medium">
                       Ism
                     </Text>
-                    <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                    <InputGroup startElement={<MdPerson color="gray.500" />}>
                       <Input
                         name="name"
                         value={formData.name}
@@ -165,7 +165,7 @@ const handleSave = () => {
                     <Text mb={1} fontSize="sm" fontWeight="medium">
                       Familiya
                     </Text>
-                    <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                    <InputGroup startElement={<MdPerson color="gray.500" />}>
                       <Input
                         name="surname"
                         value={formData.surname}
@@ -182,7 +182,7 @@ const handleSave = () => {
                     <Text mb={1} fontSize="sm" fontWeight="medium">
                       Telefon raqami
                     </Text>
-                    <InputGroup startElement={<MdPhone color="#adb5bd" />}>
+                    <InputGroup startElement={<MdPhone color="gray.500" />}>
                       <PhoneInput 
                         value={formData.phone}
                         onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
@@ -194,7 +194,7 @@ const handleSave = () => {
                     <Text mb={1} fontSize="sm" fontWeight="medium">
                       Parol (yangilash uchun)
                     </Text>
-                    <InputGroup startElement={<MdLock color="#adb5bd" />}>
+                    <InputGroup startElement={<MdLock color="gray.500" />}>
                       <Input
                         name="password"
                         type="password"
@@ -211,7 +211,7 @@ const handleSave = () => {
                   <Text mb={1} fontSize="sm" fontWeight="medium">
                     Transport turi
                   </Text>
-                  <InputGroup startElement={<MdLocalShipping color="#adb5bd" />}>
+                  <InputGroup startElement={<MdLocalShipping color="gray.500" />}>
                     <Select.Root
                       collection={transportTypes}
                       value={[formData.vehicle_type]} 
@@ -228,7 +228,7 @@ const handleSave = () => {
                         paddingLeft="30px"
                         _focusWithin={{
                           borderColor: "primary.light",
-                          boxShadow: "0 0 0 1px #379570",
+                          boxShadow: "0 0 0 1px token(colors.primary.light)",
                         }}
                       >
                         <Select.ValueText placeholder="Transport turini tanlang" />
@@ -259,7 +259,7 @@ const handleSave = () => {
                   <Text mb={1} fontSize="sm" fontWeight="medium">
                     Biriktirilgan pazandalar
                   </Text>
-                  <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                  <InputGroup startElement={<MdPerson color="gray.500" />}>
                     <Select.Root
                       multiple
                       closeOnSelect={false}
@@ -278,7 +278,7 @@ const handleSave = () => {
                         paddingLeft="30px"
                         _focusWithin={{
                           borderColor: "primary.light",
-                          boxShadow: "0 0 0 1px #379570",
+                          boxShadow: "0 0 0 1px token(colors.primary.light)",
                         }}
                       >
                         <Select.ValueText
@@ -320,7 +320,7 @@ const handleSave = () => {
               <Button
 
                 bg="primary.light"
-                _hover={{ bg: "green.600" }}
+                _hover={{ bg: "primary.dark" }}
                 onClick={handleSave}
               >
                 Saqlash

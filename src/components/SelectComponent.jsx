@@ -23,7 +23,7 @@ const SelectComponent = ({ value, onChange, options, placeholder = "Tanlang", se
 
         _focusWithin={{
           borderColor: "primary.light",
-          boxShadow: "0 0 0 1px #379570",
+          boxShadow: "0 0 0 1px token(colors.primary.light)",
         }}
       >
         <Select.ValueText placeholder={placeholder} />

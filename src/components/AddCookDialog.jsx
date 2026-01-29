@@ -38,7 +38,7 @@ const PhoneInput = ({ value, onChange }) => {
       paddingLeft="40px"
       _focus={{
         borderColor: "primary.light",
-        boxShadow: "0 0 0 1px #379570",
+        boxShadow: "0 0 0 1px token(colors.primary.light)",
       }}
     />
   );
@@ -106,7 +106,7 @@ const AddCookDialog = ({ handleAddCook }) => {
       <Button
         size="sm"
         variant="outline"
-        bg="#B5D8CA80"
+        bg="primary.white"
         _hover={{ bg: "primary.light", color: "white" }}
         onClick={() => {
           setStep("form");
@@ -146,7 +146,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                 {step === "form" ? (
                   <Box bg="white" borderRadius="md" p={4}>
                     <Flex gap={3} mb={4}>
-                      <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                      <InputGroup startElement={<MdPerson color="gray.500" />}>
                         <Input
                           placeholder="Ism"
                           value={formData.name}
@@ -159,12 +159,12 @@ const AddCookDialog = ({ handleAddCook }) => {
                           bg="white"
                           borderColor="gray.400"
                           _focus={{
-                            borderColor: "primary.light",
-                            boxShadow: "0 0 0 1px #379570",
+                            borderColor: "primary.600",
+                            boxShadow: `0 0 0 1px primary.600`,
                           }}
                         />
                       </InputGroup>
-                      <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                      <InputGroup startElement={<MdPerson color="gray.500" />}>
                         <Input
                           placeholder="Familiya"
                           value={formData.surname}
@@ -177,8 +177,8 @@ const AddCookDialog = ({ handleAddCook }) => {
                           bg="white"
                           borderColor="gray.400"
                           _focus={{
-                            borderColor: "primary.light",
-                            boxShadow: "0 0 0 1px #379570",
+                            borderColor: "primary.600",
+                            boxShadow: `0 0 0 1px primary.600`,
                           }}
                         />
                       </InputGroup>
@@ -187,7 +187,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                     <Flex gap={3} mb={4}>
                       <InputGroup
                         flex={1}
-                        startElement={<MdLocationOn color="#adb5bd" />}
+                        startElement={<MdLocationOn color="gray.500" />}
                       >
                         <Select.Root
                           value={formData.address ? [formData.address] : []}
@@ -206,8 +206,8 @@ const AddCookDialog = ({ handleAddCook }) => {
                             borderColor="gray.400"
                             paddingLeft={"30px"}
                             _focusWithin={{
-                              borderColor: "primary.light",
-                              boxShadow: "0 0 0 1px #379570",
+                              borderColor: "primary.600",
+                              boxShadow: `0 0 0 1px primary.600`,
                             }}
                           >
                             <Select.ValueText placeholder="Manzil (Hudud)" />
@@ -227,7 +227,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                       </InputGroup>
                       <InputGroup
                         flex={1}
-                        startElement={<MdPhone color="#adb5bd" />}
+                        startElement={<MdPhone color="gray.500" />}
                       >
                         <PhoneInput 
                           value={formData.phone}
@@ -239,7 +239,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                 ) : (
                   <Box bg="white" borderRadius="md" p={4}>
                     <Flex direction="column" gap={4}>
-                      <InputGroup startElement={<MdLogin color="#adb5bd" />}>
+                      <InputGroup startElement={<MdLogin color="gray.500" />}>
                         <Input
                           placeholder="Login"
                           value={loginData.login}
@@ -252,12 +252,12 @@ const AddCookDialog = ({ handleAddCook }) => {
                           bg="white"
                           borderColor="gray.400"
                           _focus={{
-                            borderColor: "primary.light",
-                            boxShadow: "0 0 0 1px #379570",
+                            borderColor: "primary.600",
+                            boxShadow: `0 0 0 1px primary.600`,
                           }}
                         />
                       </InputGroup>
-                      <InputGroup startElement={<MdLock color="#adb5bd" />}>
+                      <InputGroup startElement={<MdLock color="gray.500" />}>
                         <Input
                           placeholder="Parol"
                           type="password"
@@ -271,8 +271,8 @@ const AddCookDialog = ({ handleAddCook }) => {
                           bg="white"
                           borderColor="gray.400"
                           _focus={{
-                            borderColor: "primary.light",
-                            boxShadow: "0 0 0 1px #379570",
+                            borderColor: "primary.600",
+                            boxShadow: `0 0 0 1px primary.600`,
                           }}
                         />
                       </InputGroup>
@@ -287,7 +287,8 @@ const AddCookDialog = ({ handleAddCook }) => {
                     variant="ghost"
                     color="gray.600"
                     _hover={{ color: "primary.light" }}
-                    border={"1px solid #B5D8CA"}
+                    border={"1px solid"}
+                    borderColor="gray.400"
                     onClick={resetAll}
                   >
                     Bekor qilish
@@ -295,7 +296,7 @@ const AddCookDialog = ({ handleAddCook }) => {
                   <Button
                     bg="primary.light"
                     color="white"
-                    _hover={{ bg: "green.600" }}
+                    _hover={{ bg: "primary.dark" }}
                     px={6}
                     onClick={
                       step === "form" ? handleFormSubmit : handleLoginSubmit

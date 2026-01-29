@@ -33,7 +33,7 @@ const Navbar = () => {
         marginRight="auto"
       >
         <Link to="/home">
-          <Text color={"#379570"} fontSize={30} fontWeight={"bold"}>
+          <Text color={"primary.light"} fontSize={30} fontWeight={"bold"}>
             Pazanda
           </Text>
         </Link>
@@ -46,9 +46,9 @@ const Navbar = () => {
           borderRadius={"md"}
           bg={"white"}
           aria-label="Bell database"
-          style={{ border: "1px solid #379570" }}
+          style={{ border: "1px solid token(colors.primary.light)" }}
         >
-          <LuBell style={{ color: "#379570" }} />
+          <LuBell style={{ color: "primary.light" }} />
         </IconButton>
 
         <Box display={"flex"} align="center" gap="2">

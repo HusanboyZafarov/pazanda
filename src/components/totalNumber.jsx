@@ -18,7 +18,7 @@ const TotalNumber = ({ userCount = 0, cookCount = 0, courierCount = 0 }) => {
   ];
 
   return (
-    <Box display={"flex"}justifyContent={"space-between"} gap={"10px"} width={"1205px"}>
+    <Box display={"flex"}justifyContent={"space-between"} gap={"10px"} width={"1195px"}>
       {cards.map((card, index) => (
         <Flex
           key={index}
@@ -36,7 +36,7 @@ const TotalNumber = ({ userCount = 0, cookCount = 0, courierCount = 0 }) => {
         >
           <Box display="flex" justifyContent="center" alignItems="center" mb={2} gap={4}>
             <Box
-              bg="#379FFF"
+              bg="primary.light"
               borderRadius="full"
               w="10"
               h="10"
