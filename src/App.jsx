@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
+
 import Login from "./pages/Auth/Login.jsx";
 import Home from "./pages/Home.jsx";
 import Navbar from "./components/Navbar.jsx";
@@ -14,16 +15,18 @@ import Cooks from "./pages/Cooks.jsx";
 import Couriers from "./pages/Couriers.jsx";
 import Users from "./pages/Users.jsx";
 
+import ProtectedRoute from "./ProtectedRoute"; 
+
 const Layout = ({ children }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
 
   return (
-    <Box bg={"#F1FAF7"}>
+    <Box bg={"#F1FAF7"} minH="100vh">
       {!isLoginPage && <Navbar />}
       <div style={{ display: "flex" }}>
         {!isLoginPage && <SideBar />}
-        <div style={{ flex: 1, padding: "1rem" }}>{children}</div>
+        <div style={{  flex: 1, padding: "1rem", paddingTop: isLoginPage ? "0" : "96px", marginLeft: isLoginPage ? "0" : "285px"}}>{children}</div>
       </div>
     </Box>
   );
@@ -40,34 +43,48 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  const [cooks, setCooks] = useState(
-    Array.from({ length: 10 }, (_, i) => ({
-      name: "Dilshoda",
-      lastname: "To‘liqova",
-      meals: "10/8",
-      rating: "4.5",
-      region: "Andijon sh.",
-      tariff: "Bepul",
-      status: i % 2 === 0 ? "Online" : "Offline",
-      Lid: i % 2 === 0 ? "True" : "False",
-      date: "28.04.2025",
-      phone: "(93) 701-44-64",
-    }))
-  );
-
   return (
     <Router>
       <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/home" element={<Home />} />
+
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/cooks"
-            element={<Cooks cooks={cooks} setCooks={setCooks} />}
+            element={
+              <ProtectedRoute>
+                <Cooks />
+              </ProtectedRoute>
+            }
           />
-          <Route path="/couriers" element={<Couriers cooks={cooks} />} />
-          <Route path="/users" element={<Users />} />
+
+          <Route
+            path="/couriers"
+            element={
+              <ProtectedRoute>
+                <Couriers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Layout>
     </Router>

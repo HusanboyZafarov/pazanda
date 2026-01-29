@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Flex, Text, Button, Badge, Table } from "@chakra-ui/react";
+import { Box, Flex, Text, Button, Badge, Table, Spinner, Center } from "@chakra-ui/react";
 import { FaClipboardList } from "react-icons/fa";
 import { FiEdit3 } from "react-icons/fi";
 import { GoTrash } from "react-icons/go";
@@ -7,50 +7,79 @@ import NotificationDialog from "../components/NotificationDialog";
 import Delete from "../components/Delete";
 import AddCouriers from "../components/AddCouriers";
 import EditCourier from "../components/EditCouriers";
+import useCouriers from "../hooks/useCouriers";
+import { useCouriersLid } from "../hooks/useCouriersLid";
+import useCooks from "../hooks/useCooks";
 
-const Couriers = ({ cooks }) => {
-  const [openIndex, setOpenIndex] = useState(null);
-  const [editingIndex, setEditingIndex] = useState(null);
+const Couriers = () => {
+  const { cooks } = useCooks();
+  const { couriers, loading, error, addCourier, editCourier, deleteCourier } = useCouriers();
+  const { couriersLid } = useCouriersLid();
+  const [deletingCourier, setDeletingCourier] = useState(null);
+  const [editingCourier, setEditingCourier] = useState(null);
   const [showOnlyLids, setShowOnlyLids] = useState(false);
 
-  const [couriers, setCouriers] = useState(
-    Array.from({ length: 10 }, (_, i) => ({
-      name: "Sherzodbek. D",
-      bazar: "Rayxona G'ulomova",
-      status: i % 2 === 0 ? "Online" : "Offline",
-      Lid: i % 2 === 0 ? "True" : "False",
-      date: "28.04.2025",
-      phone: "(93) 701-44-64",
-    }))
-  );
+  const displayedCouriers = showOnlyLids ? couriersLid : couriers;
 
-  const handleAddCourier = (newCourier) => {
-    setCouriers((prev) => [...prev, newCourier]);
-  };
-
-  const handleDelete = () => {
-    if (openIndex !== null) {
-      const updated = couriers.filter((_, i) => i !== openIndex);
-      setCouriers(updated);
-      setOpenIndex(null);
+  const handleAddCourier = async (courierData) => {
+    try {
+      await addCourier(courierData);
+    } catch {
+      // Error is handled in the hook
     }
   };
 
-  const handleEditSave = (updatedCourier) => {
-    setCouriers((prev) =>
-      prev.map((c, i) => (i === editingIndex ? updatedCourier : c))
-    );
-    setEditingIndex(null);
+
+  const handleEditSave = async (courierId, updatedData) => {
+    try {
+      await editCourier(courierId, updatedData);
+      setEditingCourier(null);
+    } catch {
+      // Error is handled in the hook
+    }
   };
 
-  const filteredCouriers = showOnlyLids
-    ? couriers.filter((c) => c.Lid === "True")
-    : couriers;
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatCooks = (cooksArray) => {
+    if (!cooksArray || cooksArray.length === 0) return "-";
+    // If cooks is an array of IDs, we might need to map them to names
+    // For now, just return the count or first cook name if available
+    return cooksArray.length > 0 ? `${cooksArray.length} pazanda` : "-";
+  };
+
+  if (loading) {
+    return (
+      <Center h="100vh">
+        <Spinner size="xl" color="green.500" />
+      </Center>
+    );
+  }
+
+  if (error) {
+    return (
+      <Center h="100vh">
+        <Text color="red.500">Xatolik: {error}</Text>
+      </Center>
+    );
+  }
 
   return (
-    <Box p={4} bg="white" borderRadius="2xl" height="100vh">
-      <Flex justify="space-between" align="center" mb={4}>
-        <Text fontSize="xl" fontWeight="bold" fontFamily="systemUiB">
+    <Box p={0} bg="white" borderRadius="2xl" border="1px solid" borderColor="gray.200" height="calc(100vh - 135px)" display="flex" flexDirection="column">
+      <Flex justify="space-between" align="center" mb={4} p={4} flexShrink={0}>
+        <Text fontSize="xl" fontWeight="bold" >
           {showOnlyLids ? "Murojaatlar ro'yxati" : "Kuryerlar"}
         </Text>
 
@@ -74,7 +103,7 @@ const Couriers = ({ cooks }) => {
         </Flex>
       </Flex>
 
-      <Box maxH="600px" overflow="auto" rounded="md" bg="white">
+      <Box flex="1" overflow="auto" rounded="md" bg="white" p={4}>
         <Table.Root size="sm" variant="line">
           <Table.Header bg="white">
             <Table.Row>
@@ -88,19 +117,19 @@ const Couriers = ({ cooks }) => {
           </Table.Header>
 
           <Table.Body>
-            {filteredCouriers.map((courier, index) => (
-              <Table.Row key={index} _hover={{ bg: "gray.100" }}>
-                <Table.Cell>{courier.name}</Table.Cell>
-                <Table.Cell>{courier.bazar}</Table.Cell>
+            {displayedCouriers.map((courier, index) => (
+              <Table.Row key={courier.user || `courier-${index}`} _hover={{ bg: "gray.100" }}>
+                <Table.Cell>{courier.full_name || "-"}</Table.Cell>
+                <Table.Cell>{formatCooks(courier.cooks)}</Table.Cell>
                 <Table.Cell>
                   <Badge
                     colorScheme={courier.status === "Online" ? "green" : "gray"}
                   >
-                    {courier.status}
+                    {courier.status || "Offline"}
                   </Badge>
                 </Table.Cell>
-                <Table.Cell>{courier.date}</Table.Cell>
-                <Table.Cell>{courier.phone}</Table.Cell>
+                <Table.Cell>{formatDate(courier.date_joined)}</Table.Cell>
+                <Table.Cell>{courier.phone || "-"}</Table.Cell>
                 <Table.Cell>
                   <Flex gap={2}>
                     <Button
@@ -109,7 +138,7 @@ const Couriers = ({ cooks }) => {
                       variant="outline"
                       colorScheme="green"
                       bg="#B5D8CA80"
-                      onClick={() => setEditingIndex(index)}
+                      onClick={() => setEditingCourier(courier)}
                       _hover={{ bg: "primary.light", color: "white" }}
                     >
                       <FiEdit3 style={{ width: "20px" }} />
@@ -120,7 +149,7 @@ const Couriers = ({ cooks }) => {
                       variant="outline"
                       colorScheme="green"
                       bg="#B5D8CA80"
-                      onClick={() => setOpenIndex(index)}
+                      onClick={() => setDeletingCourier(courier)}
                       _hover={{ bg: "primary.light", color: "white" }}
                     >
                       <GoTrash style={{ width: "20px" }} />
@@ -134,15 +163,19 @@ const Couriers = ({ cooks }) => {
       </Box>
 
       <Delete
-        isOpen={openIndex !== null}
-        onClose={() => setOpenIndex(null)}
-        onConfirm={handleDelete}
+        isOpen={!!deletingCourier}
+        onClose={() => setDeletingCourier(null)}
+        onConfirm={async () => {
+          await deleteCourier(deletingCourier.user);
+          setDeletingCourier(null);
+        }}
       />
 
       <EditCourier
-        isOpen={editingIndex !== null}
-        onClose={() => setEditingIndex(null)}
-        courier={editingIndex !== null ? couriers[editingIndex] : null}
+        isOpen={editingCourier !== null}
+        onClose={() => setEditingCourier(null)}
+        courier={editingCourier}
+        cooks={cooks}
         onSave={handleEditSave}
       />
     </Box>

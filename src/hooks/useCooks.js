@@ -1,100 +1,125 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../services/api-Client";
 import { toaster } from "@/components/ui/toaster";
 
 const useCooks = () => {
-  const [cooks, setCooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
-  const fetchCooks = useCallback(async () => {
-    try {
-      setLoading(true);
+  // Fetch cooks with React Query
+  const {
+    data: cooks = [],
+    isLoading: loading,
+    error,
+    refetch: fetchCooks,
+  } = useQuery({
+    queryKey: ["cooks"],
+    queryFn: async () => {
       const response = await apiClient.get("/main/admin/cooks/");
-      setCooks(response.data);
-    } catch (err) {
-      console.error("Pazandalarni olishda xatolik:", err);
-      setError(err.message || "Xatolik yuz berdi");
-      toaster.create({
-        title: "Xatolik yuz berdi",
-        description: "Pazandalar ro'yxatini yuklashda muammo bo'ldi.",
-        type: "error",
-        duration: 4000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+  });
 
-  useEffect(() => {
-    fetchCooks();
-  }, [fetchCooks]);
-
-  const addCook = async (cookData) => {
-    try {
+  // Add cook mutation
+  const addCookMutation = useMutation({
+    mutationFn: async (cookData) => {
       const response = await apiClient.post("/main/admin/cooks/create/", cookData);
-      // Yangi cook qo'shilgandan keyin ro'yxatni qaytadan yuklaymiz,
-      // chunki backenddan keladigan javob har doim ham to'liq obyekt bo'lmasligi mumkin.
-      await fetchCooks();
-      const cookName = response.data?.full_name || cookData.full_name || "Pazanda";
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate and refetch cooks
+      queryClient.invalidateQueries({ queryKey: ["cooks"] });
+      
+      const cookName = data?.full_name || variables.full_name || "Pazanda";
       toaster.create({
         title: "Pazanda qo'shildi",
         description: `${cookName} muvaffaqiyatli qo'shildi.`,
         type: "success",
       });
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Pazanda qo'shishda xatolik:", err);
       toaster.create({
         title: "Xatolik yuz berdi",
         description: "Pazanda qo'shishda muammo bo'ldi.",
         type: "error",
       });
-      throw err; // Xatolikni yuqoriga tashlaymiz, shunda AddCookDialog dialogni yopmasligini biladi
-    }
-  };
+    },
+  });
 
-  const editCook = async (id, updatedData) => {
-    try {
+  // Edit cook mutation
+  const editCookMutation = useMutation({
+    mutationFn: async ({ id, updatedData }) => {
       const response = await apiClient.put(`/main/admin/cooks/${id}/update/`, updatedData);
-      // Yangilashdan keyin ro'yxatni qaytadan yuklaymiz,
-      // chunki backenddan keladigan javob har doim ham to'liq obyekt bo'lmasligi mumkin.
-      await fetchCooks();
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch cooks
+      queryClient.invalidateQueries({ queryKey: ["cooks"] });
+      
       toaster.create({
         title: "O'zgarish saqlandi",
         description: "Pazanda ma'lumotlari yangilandi.",
         type: "success",
       });
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Pazandani tahrirlashda xatolik:", err);
       toaster.create({
         title: "Xatolik yuz berdi",
         description: "Pazanda ma'lumotlarini yangilashda muammo bo'ldi.",
         type: "error",
       });
-      throw err; // Xatolikni yuqoriga tashlaymiz
-    }
-  };
+    },
+  });
 
-  const deleteCook = async (id) => {
-    try {
+  // Delete cook mutation
+  const deleteCookMutation = useMutation({
+    mutationFn: async (id) => {
       await apiClient.delete(`/main/admin/cooks/${id}/delete/`);
-      setCooks((prev) => prev.filter((cook) => cook.user !== id));
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      // Optimistic update - remove from cache immediately
+      queryClient.setQueryData(["cooks"], (oldData) => 
+        oldData.filter((cook) => cook.user !== deletedId)
+      );
+      
       toaster.create({
         title: "Pazanda o'chirildi",
         description: "Pazanda muvaffaqiyatli ro'yxatdan o'chirildi.",
         type: "success",
       });
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Pazandani o'chirishda xatolik:", err);
       toaster.create({
         title: "Xatolik yuz berdi",
         description: "Pazandani o'chirishda muammo bo'ldi.",
         type: "error",
       });
-    }
-  };
+      // Refetch on error to restore correct state
+      queryClient.invalidateQueries({ queryKey: ["cooks"] });
+    },
+  });
 
-  return { cooks, setCooks, loading, error, addCook, editCook, deleteCook };
+  const addCook = (cookData) => addCookMutation.mutate(cookData);
+  const editCook = (id, updatedData) => editCookMutation.mutate({ id, updatedData });
+  const deleteCook = (id) => deleteCookMutation.mutate(id);
+
+  return { 
+    cooks, 
+    loading, 
+    error, 
+    addCook, 
+    editCook, 
+    deleteCook, 
+    fetchCooks,
+    isAdding: addCookMutation.isPending,
+    isEditing: editCookMutation.isPending,
+    isDeleting: deleteCookMutation.isPending,
+  };
 };
 
 export default useCooks;

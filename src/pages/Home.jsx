@@ -72,13 +72,13 @@ const Home = () => {
   }, [incomeRows]);
 
   return (
-    <Box p={4} height="100vh">
+    <Box p={0}>
       <TotalNumber userCount={userCount} cookCount={cookCount} courierCount={courierCount} />
 
-      <Flex gap={4} mt={6} wrap="wrap">
+      <Flex gap={4} mt={4} wrap="wrap" >
         <Box
           border="1px solid #E2E8F0"
-          borderRadius="md"
+          bg={"white"}
           display="flex"
           flexDirection="column"
           alignItems={"center"}
@@ -86,9 +86,10 @@ const Home = () => {
           p={4}
           width="250px"
           height="250px"
+          borderRadius="2xl"
         >
-          <Text fontWeight="bold" mr="165px">Tariflar</Text>
-          <Chart.Root boxSize="220px" mx="auto" chart={buyurtmaChart}>
+          <Text fontWeight="bold" alignSelf="flex-start" mb={2}>Tariflar</Text>
+          <Chart.Root boxSize="180px" mx="auto" chart={buyurtmaChart}  >
             <PieChart>
               <Tooltip
                 cursor={false}
@@ -115,15 +116,17 @@ const Home = () => {
         <Box
           flex="1"
           border="1px solid #E2E8F0"
-          borderRadius="md"
+          bg={"white"}
+          borderRadius="2xl"
           p={4}
           height="250px"
           width="1100px"
+          minWidth="400px"
         >
           <Flex justify="space-between" mb={2}>
             <Text fontWeight="bold">Daromad bo'yicha tariflar</Text>
             <ButtonGroup size="sm" isAttached>
-              {(["haftalik", "oylik", "yillik"]).map((t) => (
+              {(["Haftalik", "Oylik", "Yillik"]).map((t) => (
                 <Button key={t} onClick={() => setPeriodType(t)} variant={periodType === t ? "solid" : "outline"} bg={periodType === t ? "primary.light" : "transparent"} _hover={{ bg: periodType === t ? "primary.light" : "gray.100" }}>
                   {t}
                 </Button>
@@ -145,10 +148,11 @@ const Home = () => {
         </Box>
       </Flex>
 
-      <Flex gap={4} mt={6} wrap="wrap">
+      <Flex gap={4} mt={4} wrap="wrap">
         <Box
           border="1px solid #E2E8F0"
-          borderRadius="md"
+          bg={"white"}
+          borderRadius="2xl"
           display="flex"
           flexDirection="column"
           alignItems={"center"}
@@ -157,7 +161,7 @@ const Home = () => {
           width="250px"
           height="250px"
         >
-          <Text fontWeight="bold" mr="120px">Tariflar bo'linishi</Text>
+          <Text fontWeight="bold" alignSelf="flex-start">Tariflar bo'linishi</Text>
           <Chart.Root boxSize="220px" mx="auto" chart={buyurtmaChart}>
             <PieChart>
               <Tooltip
@@ -191,10 +195,12 @@ const Home = () => {
         <Box
           flex="1"
           border="1px solid #E2E8F0"
-          borderRadius="md"
+          bg={"white"}
+          borderRadius="2xl"
           p={4}
           height="250px"
           width="1100px"
+          minWidth="400px"
         >
           <ResponsiveContainer width="100%" height={190}>
             <BarChart data={incomeRows} barCategoryGap={20} barGap={5}>

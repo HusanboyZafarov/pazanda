@@ -1,17 +1,15 @@
 import {
   Box,
-  IconButton,
-  Image,
-  Input,
-  InputGroup,
+  IconButton, 
   Text,
 } from "@chakra-ui/react";
-import { LuSearch, LuBell } from "react-icons/lu";
-import Logo from "../assets/images/logo.svg";
+import { LuBell } from "react-icons/lu";
 import { Link } from "react-router-dom";
-import ProfileImg from "../assets/images/telegram-peer-photo-size-2-4467101622810552291-1-0-0 1.png";
+import useAuth from "../hooks/useAuth";
 
 const Navbar = () => {
+  const { user } = useAuth();
+
   return (
     <Box
       display="flex"
@@ -20,6 +18,11 @@ const Navbar = () => {
       p={4}
       bg="white"
       width="100%"
+      position="fixed"
+      top="0"
+      left="0"
+      zIndex="1000"
+      boxShadow="sm"
     >
       <Box
         display="flex"
@@ -30,12 +33,14 @@ const Navbar = () => {
         marginRight="auto"
       >
         <Link to="/home">
-          <Image width={"90px"} src={Logo} />
+          <Text color={"#379570"} fontSize={30} fontWeight={"bold"}>
+            Pazanda
+          </Text>
         </Link>
-        <InputGroup startElement={<LuSearch />}>
-          <Input borderRadius={"md"} placeholder="Search" />
-        </InputGroup>
+
+
       </Box>
+
       <Box display="flex" alignItems="center" gap={"10px"} maxWidth="350px">
         <IconButton
           borderRadius={"md"}
@@ -47,16 +52,13 @@ const Navbar = () => {
         </IconButton>
 
         <Box display={"flex"} align="center" gap="2">
-          <Image borderRadius="full" src={ProfileImg} />
           <Box lineHeight="1">
-            <Box lineHeight="1">
-              <Text fontSize="lg" fontWeight="semibold">
-                Murodillo. I
-              </Text>
-              <Text fontSize="md" color="gray.500">
-                Admin
-              </Text>
-            </Box>
+            <Text fontSize="lg" fontWeight="semibold">
+              {user?.full_name }
+            </Text>
+            <Text fontSize="md" color="gray.500">
+              {user?.role || ""}
+            </Text>
           </Box>
         </Box>
       </Box>

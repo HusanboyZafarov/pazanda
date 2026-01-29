@@ -12,18 +12,43 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { IoIosAddCircleOutline } from "react-icons/io";
-import { MdPerson, MdPhone, MdLocalShipping } from "react-icons/md";
-import SelectComponent from "./SelectComponent";
+import { MdPerson, MdPhone, MdLocalShipping, MdLock } from "react-icons/md";
+import { toaster } from "@/components/ui/toaster";
+import { useIMask } from 'react-imask';
+
+const PhoneInput = ({ value, onChange }) => {
+  const { ref } = useIMask({
+    mask: '+{998} 00 000-00-00',
+    onAccept: (value) => onChange(value),
+    placeholder: '+998 __ ___-__-__'
+  });
+
+  return (
+    <Input
+      ref={ref}
+      placeholder="+998 __ ___-__-__"
+      inputMode="numeric"
+      bg="white"
+      borderColor="gray.400"
+      paddingLeft="40px"
+      _focus={{
+        borderColor: "primary.light",
+        boxShadow: "0 0 0 1px #379570",
+      }}
+    />
+  );
+};
+
 
 
 const AddCouriers = ({ cooks = [], handleAddCourier }) => {
   const pazandalarCollection = useMemo(
     () =>
       createListCollection({
-        items: cooks.map((cook, idx) => ({
-          label: `${cook.name}${cook.lastname ? " " + cook.lastname : ""}`,
-          value: idx.toString(),
-        })),
+        items: cooks.map((cook) => ({
+          label: cook.full_name || `${cook.name || ""} ${cook.lastname || ""}`.trim(),
+          value: cook.user?.toString() || cook.id?.toString() || "",
+        })).filter(item => item.value),
       }),
     [cooks]
   );
@@ -33,11 +58,11 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
     surname: "",
     transport: "",
     phone: "",
+    password: "",
     bazars: "",
   });
   const [isOpen, setIsOpen] = useState(false);
-  
-  console.log("AddCouriers render - isOpen:", isOpen);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetAll = () => {
     setFormData({
@@ -45,31 +70,121 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
       surname: "",
       transport: "",
       phone: "",
+      password: "",
       bazars: "",
     });
     setIsOpen(false);
   };
 
-  const handleSubmit = () => {
-    const { name, surname, phone, transport, bazars } = formData;
-    if (!name || !surname || !phone || !bazars) return;
 
-    const selected = pazandalarCollection.items.find((i) => i.value === bazars);
-    const selectedBazars = selected ? [selected.value] : [];
-    const selectedBazarLabels = selected ? [selected.label] : [];
 
-    const newCourier = {
-      fullName: `${name} ${surname}`,
-      transport,
-      phone,
-      bazars: selectedBazars,
-      bazarLabels: selectedBazarLabels,
-      status: "Offline",
-      date: new Date().toLocaleDateString("en-GB"),
+  const handleSubmit = async () => {
+    const { name, surname, phone, transport, password, bazars } = formData;
+    
+    console.log("Form data before submit:", formData);
+    console.log("Selected bazars value:", bazars);
+    
+    // Validatsiya
+    if (!name || !name.trim()) {
+      toaster.create({
+        title: "Xatolik",
+        description: "Ism maydoni to'ldirilishi shart.",
+        type: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!surname || !surname.trim()) {
+      toaster.create({
+        title: "Xatolik",
+        description: "Familiya maydoni to'ldirilishi shart.",
+        type: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!phone || !phone.trim()) {
+      toaster.create({
+        title: "Xatolik",
+        description: "Telefon raqami maydoni to'ldirilishi shart.",
+        type: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!password || !password.trim()) {
+      toaster.create({
+        title: "Xatolik",
+        description: "Parol maydoni to'ldirilishi shart.",
+        type: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Get selected cook IDs - API requires at least one cook
+    let selectedCookIds = [];
+    if (bazars) {
+      // bazars is already a string ID from the select, convert to number
+      const cookId = parseInt(bazars);
+      console.log("Parsed cook ID:", cookId);
+      if (!isNaN(cookId) && cookId > 0) {
+        selectedCookIds = [cookId];
+      }
+    }
+
+    console.log("Selected cook IDs:", selectedCookIds);
+
+    // Validate that we have at least one cook selected
+    if (!bazars || selectedCookIds.length === 0) {
+      toaster.create({
+        title: "Xatolik",
+        description: "Kamida bitta pazanda tanlanishi shart.",
+        type: "error",
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Map vehicle type to API format
+    const vehicleTypeMap = {
+      "yengil moshina": "car",
+      "velosiped": "bicycle",
+      "skuter": "scooter",
+      "piyoda": "foot",
+    };
+    const vehicle_type = transport ? vehicleTypeMap[transport] || "foot" : "foot";
+
+    const defaultBirthDate = new Date();
+    defaultBirthDate.setFullYear(defaultBirthDate.getFullYear() - 18);
+    const birthDateString = defaultBirthDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+    const courierPayload = {
+      full_name: `${name.trim()} ${surname.trim()}`.trim(),
+      phone: phone.trim(),
+      password: password,
+      is_active: true,
+      vehicle_type: vehicle_type,
+      working: true,
+      cooks: selectedCookIds,
+      telegram: "",
+      birth_date: birthDateString,
+      firebase_token: "",
     };
 
-    handleAddCourier?.(newCourier);
-    resetAll();
+    setIsSubmitting(true);
+    try {
+      await handleAddCourier?.(courierPayload);
+      resetAll();
+    } catch (error) {
+      // Error is handled in the hook, but we can show additional info here if needed
+      console.error("Kuryer qo'shishda xatolik:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -79,10 +194,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
         variant="outline"
         bg="#B5D8CA80"
         _hover={{ bg: "primary.light", color: "white" }}
-        onClick={() => {
-          console.log("Button clicked, setting isOpen to true");
-          setIsOpen(true);
-        }}
+        onClick={() => setIsOpen(true)}
       >
         <IoIosAddCircleOutline />
         Kuryer qo‘shish
@@ -117,7 +229,7 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                 </Dialog.CloseTrigger>
               </Dialog.Header>
 
-              <Dialog.Body mb={6}>
+              <Dialog.Body mb={12}>
                 <Box bg="white" borderRadius="md" p={4}>
                   <Flex gap={3} mb={4}>
                     <InputGroup startElement={<MdPerson color="#adb5bd" />}>
@@ -158,10 +270,11 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                       startElement={<MdLocalShipping color="#adb5bd" />}
                     >
                       <Select.Root
-                        selected={(item) => item.value === formData.transport}
-                        onSelect={(item) =>
-                          setFormData({ ...formData, transport: item.value })
-                        }
+                        value={formData.transport ? [formData.transport] : []}
+                        onValueChange={(details) => {
+                          const selectedValue = details.value[0];
+                          setFormData({ ...formData, transport: selectedValue });
+                        }}
                         collection={transportTypes}
                       >
                         <Select.HiddenSelect />
@@ -198,70 +311,88 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                       </Select.Root>
                     </InputGroup>
 
-                    <InputGroup
-                      flex={1}
-                      startElement={<MdPhone color="#adb5bd" />}
-                    >
-                      <Input
-                        placeholder="+998 __ ___‑__‑__"
-                        type="tel"
+                    
+                    <InputGroup flex={1} startElement={<MdPhone color="#adb5bd" />}>
+                      <PhoneInput 
                         value={formData.phone}
-                        onChange={(e) =>
-                          setFormData({ ...formData, phone: e.target.value })
-                        }
-                        bg="white"
-                        borderColor="gray.400"
-                        _focus={{
-                          borderColor: "primary.light",
-                          boxShadow: "0 0 0 1px #379570",
-                        }}
+                        onChange={(value) => setFormData({ ...formData, phone: value })}
                       />
                     </InputGroup>
+
                   </Flex>
 
-                  <InputGroup startElement={<MdPerson color="#adb5bd" />}>
-                    <Select.Root
-                      selected={(item) => item.value === formData.bazars}
-                      onSelect={(item) =>
-                        setFormData({ ...formData, bazars: item.value })
+                  <InputGroup startElement={<MdLock color="#adb5bd" />} mb={4}>
+                    <Input
+                      placeholder="Parol"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
                       }
-                      collection={pazandalarCollection}
-                    >
-                      <Select.HiddenSelect />
-                      <Select.Trigger
-                        flex={1}
-                        bg="white"
-                        borderColor="gray.400"
-                        paddingLeft="30px"
-                        _focusWithin={{
-                          borderColor: "primary.light",
-                          boxShadow: "0 0 0 1px #379570",
+                      bg="white"
+                      borderColor="gray.400"
+                      _focus={{
+                        borderColor: "primary.light",
+                        boxShadow: "0 0 0 1px #379570",
+                      }}
+                    />
+                  </InputGroup>
+
+                  <InputGroup startElement={<MdPerson color="#adb5bd" />}>
+                    {pazandalarCollection.items.length > 0 ? (
+                      <Select.Root
+                        value={formData.bazars ? [formData.bazars] : []}
+                        onValueChange={(details) => {
+                          const selectedValue = details.value[0];
+                          console.log("Selected cook value:", selectedValue);
+                          setFormData({ ...formData, bazars: selectedValue });
                         }}
+                        collection={pazandalarCollection}
                       >
-                        <Select.ValueText
-                          placeholder="Pazandani tanlang"
-                          value={
-                            pazandalarCollection.items.find(
-                              (i) => i.value === formData.bazars
-                            )?.label
-                          }
-                        />
-                        <Select.Indicator />
-                      </Select.Trigger>
-                      <Select.Positioner>
-                        <Select.Content
-                          overflowY="scroll"
-                          maxHeight="80px"
+                        <Select.HiddenSelect />
+                        <Select.Trigger
+                          flex={1}
+                          bg="white"
+                          borderColor="gray.400"
+                          paddingLeft="30px"
+                          _focusWithin={{
+                            borderColor: "primary.light",
+                            boxShadow: "0 0 0 1px #379570",
+                          }}
                         >
-                          {pazandalarCollection.items.map((item) => (
-                            <Select.Item key={item.value} item={item}>
-                              {item.label}
-                              <Select.ItemIndicator />
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Positioner>
-                    </Select.Root>
+                          <Select.ValueText
+                            placeholder="Pazandani tanlang (majburiy)"
+                          >
+                            {formData.bazars
+                              ? pazandalarCollection.items.find(
+                                  (i) => i.value === formData.bazars
+                                )?.label || "Pazandani tanlang (majburiy)"
+                              : "Pazandani tanlang (majburiy)"}
+                          </Select.ValueText>
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Positioner>
+                          <Select.Content
+                            overflowY="scroll"
+                            maxHeight="200px"
+                          >
+                            {pazandalarCollection.items.map((item) => (
+                              <Select.Item key={item.value} item={item}>
+                                {item.label}
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Positioner>
+                      </Select.Root>
+                    ) : (
+                      <Input
+                        placeholder="Pazandalar mavjud emas"
+                        disabled
+                        bg="gray.100"
+                        borderColor="gray.300"
+                      />
+                    )}
                   </InputGroup>
                 </Box>
               </Dialog.Body>
@@ -283,6 +414,9 @@ const AddCouriers = ({ cooks = [], handleAddCourier }) => {
                     _hover={{ bg: "green.600" }}
                     px={6}
                     onClick={handleSubmit}
+                    isLoading={isSubmitting}
+                    loadingText="Saqlanmoqda..."
+                    disabled={isSubmitting}
                   >
                     Saqlash
                   </Button>
@@ -301,6 +435,7 @@ const transportTypes = createListCollection({
     { label: "Yengil moshina", value: "yengil moshina" },
     { label: "Velosiped", value: "velosiped" },
     { label: "Skuter", value: "skuter" },
+    { label: "Piyoda", value: "piyoda" }
   ],
 });
 

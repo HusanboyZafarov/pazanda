@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
 });
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  // <StrictMode> // Vaqtincha o'chirib qo'yilgan
     <QueryClientProvider client={queryClient}>
       <ChakraProvider value={system}>
         <App />
@@ -24,5 +24,5 @@ createRoot(document.getElementById("root")).render(
       </ChakraProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
-  </StrictMode>
+  // </StrictMode>
 );

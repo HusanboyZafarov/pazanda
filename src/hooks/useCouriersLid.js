@@ -2,16 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import apiClient from "../services/api-Client";
 import { toaster } from "@/components/ui/toaster";
 
-export const useCooksLid = () => {
+export const useCouriersLid = () => {
   const {
-    data: cooksLid = [],
+    data: couriersLid = [],
     isLoading: loading,
     error,
-    refetch: fetchCooksLid,
+    refetch: fetchCouriersLid,
   } = useQuery({
-    queryKey: ["cooksLid"],
+    queryKey: ["couriersLid"],
     queryFn: async () => {
-      const response = await apiClient.get("/main/admin/cooks/incomplete/");
+      const response = await apiClient.get("/main/admin/couriers/incomplete/");
       return response.data;
     },
     staleTime: 3 * 60 * 1000, // 3 minutes
@@ -21,15 +21,14 @@ export const useCooksLid = () => {
 
   // Show error toast if there's an error
   if (error) {
-    console.error("Cooks lidni olishda xatolik:", error);
+    console.error("Couriers lidni olishda xatolik:", error);
     toaster.create({
       title: "Xatolik yuz berdi",
-      description: "Pazanda murojaatlarini yuklashda muammo bo'ldi.",
-      status: "error",
+      description: "Kuryerlar murojaatlarini yuklashda muammo bo'ldi.",
+      type: "error",
       duration: 5000,
-      isClosable: true,
     });
   }
 
-  return { cooksLid, loading, error, refetch: fetchCooksLid };
+  return { couriersLid, loading, error, refetch: fetchCouriersLid };
 };

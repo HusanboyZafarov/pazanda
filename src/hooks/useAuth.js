@@ -5,6 +5,15 @@ import { toaster } from "@/components/ui/toaster";
 
 export default function useAuth() {
   const [token, setToken] = useState(() => getToken());
+
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,16 +28,28 @@ export default function useAuth() {
       formData.append("phone", phone);
       formData.append("password", password);
 
-      const { data } = await apiClient.post(
-        "/main/login/password/",
-        formData
-      );
+      const { data } = await apiClient.post("/main/login/password/", formData);
 
       const accessToken = data?.access;
 
       if (accessToken) {
         localStorage.setItem("token", accessToken);
         setToken(accessToken);
+
+        const apiUser = data?.user || data?.profile || data?.account || data || {};
+        console.log(apiUser);
+
+        const normalizedUser = {
+          full_name:
+            apiUser?.full_name ||
+            apiUser?.fullname ||
+            apiUser?.name ||
+            apiUser?.first_name,
+          role: apiUser?.role || apiUser?.position || apiUser?.type || "",
+        };
+
+        localStorage.setItem("user", JSON.stringify(normalizedUser));
+        setUser(normalizedUser);
       }
 
       return {
@@ -41,7 +62,6 @@ export default function useAuth() {
       const message =
         e?.response?.data?.detail || e?.message || "Login failed";
 
-      // ✅ CHAKRA UI TOASTER
       toaster.create({
         title: "Xatolik",
         description: message,
@@ -59,7 +79,9 @@ export default function useAuth() {
 
   const logout = useCallback(() => {
     removeToken();
+    localStorage.removeItem("user"); 
     setToken(null);
+    setUser(null);
 
     toaster.create({
       title: "Chiqildi",
@@ -71,8 +93,13 @@ export default function useAuth() {
 
   useEffect(() => {
     const onStorage = (evt) => {
-      if (evt.key === "token") {
-        setToken(evt.newValue);
+      if (evt.key === "token") setToken(evt.newValue);
+      if (evt.key === "user") {
+        try {
+          setUser(evt.newValue ? JSON.parse(evt.newValue) : null);
+        } catch {
+          setUser(null);
+        }
       }
     };
 
@@ -82,6 +109,7 @@ export default function useAuth() {
 
   return {
     token,
+    user, 
     isAuthenticated,
     loading,
     error,

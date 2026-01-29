@@ -50,8 +50,8 @@ const Cooks = () => {
   }
 
   return (
-    <Box p={4} bg="white" borderRadius="2xl" height="100vh">
-      <Flex justify="space-between" align="center" mb={4}>
+    <Box p={0} bg="white" borderRadius="2xl" border="1px solid" borderColor="gray.200" height="calc(100vh - 135px)" display="flex" flexDirection="column">
+      <Flex justify="space-between" align="center" mb={4} p={4} flexShrink={0}>
         <Text fontSize="xl" fontWeight="bold">
           Pazandalar
         </Text>
@@ -76,7 +76,7 @@ const Cooks = () => {
         </Flex>
       </Flex>
 
-      <Box maxH="600px" overflow="auto" rounded="md" bg="white">
+      <Box flex="1" overflow="auto" rounded="md" bg="white" p={4}>
         <Table.Root size="sm" variant="line">
           <Table.Header bg="white">
             <Table.Row>

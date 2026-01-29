@@ -1,120 +1,150 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../services/api-Client";
 import { toaster } from "@/components/ui/toaster";
 
 const useCouriers = () => {
-  const [couriers, setCouriers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
-  // 📌 Couriers list (incomplete)
-  useEffect(() => {
-    const fetchCouriers = async () => {
-      try {
-        setLoading(true);
-        const response = await apiClient.get(
-          "/main/admin/couriers/incomplete/"
-        );
-        setCouriers(response.data);
-      } catch (err) {
-        console.error("Kuryerlarni olishda xatolik:", err);
-        setError(err.message || "Xatolik yuz berdi");
-        toaster.create({
-          title: "Xatolik yuz berdi",
-          description: "Kuryerlar ro‘yxatini yuklashda muammo bo‘ldi.",
-          type: "error",
-          duration: 4000,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+  // 📌 Fetch couriers list with React Query
+  const {
+    data: couriers = [],
+    isLoading: loading,
+    error,
+    refetch: fetchCouriers,
+  } = useQuery({
+    queryKey: ["couriers"],
+    queryFn: async () => {
+      const response = await apiClient.get("/main/admin/couriers/");
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+  });
 
-    fetchCouriers();
-  }, []);
-
-  // ➕ Add courier
-  const addCourier = async (courierData) => {
-    try {
+  // ➕ Add courier mutation
+  const addCourierMutation = useMutation({
+    mutationFn: async (courierData) => {
+      console.log("SENT courierData:", courierData);
+      
       const response = await apiClient.post(
         "/main/admin/couriers/create/",
-        courierData
+        courierData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
-      setCouriers((prev) => [...prev, response.data]);
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate and refetch couriers
+      queryClient.invalidateQueries({ queryKey: ["couriers"] });
+      
+      const courierName = data?.full_name || variables.full_name || "Kuryer";
       toaster.create({
-        title: "Kuryer qo‘shildi",
-        description: "Kuryer muvaffaqiyatli qo‘shildi.",
+        title: "Kuryer qo'shildi",
+        description: `${courierName} muvaffaqiyatli qo'shildi.`,
         type: "success",
       });
-    } catch (err) {
-      console.error("Kuryer qo‘shishda xatolik:", err);
+    },
+    onError: (err) => {
+      console.error("Kuryer qo'shishda xatolik:", err);
       toaster.create({
         title: "Xatolik yuz berdi",
-        description: "Kuryer qo‘shishda muammo bo‘ldi.",
+        description: "Kuryer qo'shishda muammo bo'ldi.",
         type: "error",
       });
-    }
-  };
+    },
+  });
 
-  // ✏️ Edit courier
-  const editCourier = async (id, updatedData) => {
-    try {
+  // ✏️ Edit courier mutation
+  const editCourierMutation = useMutation({
+    mutationFn: async ({ id, updatedData }) => {
+      console.log('Received data in editCourier:', JSON.stringify(updatedData, null, 2));
+      
+      const payload = {
+        ...updatedData, // Keep all the data as is
+      };
+      
+      console.log('Sending to API:', JSON.stringify(payload, null, 2));
+      
       const response = await apiClient.put(
         `/main/admin/couriers/${id}/update/`,
-        updatedData
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
       );
-      setCouriers((prev) =>
-        prev.map((courier) =>
-          courier.id === id ? response.data : courier
-        )
-      );
+      
+      console.log('API Response:', response.data);
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch couriers
+      queryClient.invalidateQueries({ queryKey: ["couriers"] });
+      
       toaster.create({
-        title: "O‘zgarish saqlandi",
-        description: "Kuryer ma‘lumotlari yangilandi.",
+        title: "O'zgarish saqlandi",
+        description: "Kuryer ma'lumotlari yangilandi.",
         type: "success",
       });
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Kuryerni tahrirlashda xatolik:", err);
       toaster.create({
         title: "Xatolik yuz berdi",
-        description: "Kuryer ma‘lumotlarini yangilashda muammo bo‘ldi.",
+        description: err.response?.data?.detail || "Kuryer ma'lumotlarini yangilashda muammo bo'ldi.",
         type: "error",
       });
-    }
-  };
+    },
+  });
 
-  // 🗑 Delete courier
-  const deleteCourier = async (courierId) => {
-    try {
-      await apiClient.delete(
-        `/main/admin/couriers/${courierId}/delete/`
+  // 🗑 Delete courier mutation
+  const deleteCourierMutation = useMutation({
+    mutationFn: async (courierId) => {
+      await apiClient.delete(`/main/admin/couriers/${courierId}/delete/`);
+      return courierId;
+    },
+    onSuccess: (deletedId) => {
+      // Optimistic update - remove from cache immediately
+      queryClient.setQueryData(["couriers"], (oldData) =>
+        oldData.filter((courier) => courier.user !== deletedId)
       );
-      setCouriers((prev) =>
-        prev.filter((courier) => courier.id !== courierId)
-      );
+      
       toaster.create({
-        title: "Kuryer o‘chirildi",
-        description: "Kuryer muvaffaqiyatli o‘chirildi.",
+        title: "Kuryer o'chirildi",
+        description: "Kuryer muvaffaqiyatli o'chirildi.",
         type: "success",
       });
-    } catch (err) {
-      console.error("Kuryerni o‘chirishda xatolik:", err);
+    },
+    onError: (err) => {
+      console.error("Kuryerni o'chirishda xatolik:", err);
       toaster.create({
         title: "Xatolik yuz berdi",
-        description: "Kuryerni o‘chirishda muammo bo‘ldi.",
+        description: "Kuryerni o'chirishda muammo bo'ldi.",
         type: "error",
       });
-    }
-  };
+      // Refetch on error to restore correct state
+      queryClient.invalidateQueries({ queryKey: ["couriers"] });
+    },
+  });
+
+  const addCourier = (courierData) => addCourierMutation.mutate(courierData);
+  const editCourier = (id, updatedData) => editCourierMutation.mutate({ id, updatedData });
+  const deleteCourier = (courierId) => deleteCourierMutation.mutate(courierId);
 
   return {
     couriers,
-    setCouriers,
     loading,
     error,
     addCourier,
     editCourier,
     deleteCourier,
+    fetchCouriers,
+    isAdding: addCourierMutation.isPending,
+    isEditing: editCourierMutation.isPending,
+    isDeleting: deleteCourierMutation.isPending,
   };
 };
 

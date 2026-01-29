@@ -1,34 +1,41 @@
-import { useEffect, useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import apiClient from "../services/api-Client";
-import { toaster } from "@/components/ui/toaster"
+import { toaster } from "@/components/ui/toaster";
   
 export default function useDashboard() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const fetchDashboard = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
+  const {
+    data: dashboardData = null,
+    isLoading: loading,
+    error,
+    refetch: fetchDashboard,
+  } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: async () => {
       const response = await apiClient.get("/main/admin/dashboard/");
-      setData(response.data ?? null);
-    } catch (e) {
-      const message = e?.response?.data?.detail || e?.message || "Failed to load dashboard";
-      toaster.create({
-        title: message,
-        status: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      return response.data ?? null;
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes - dashboard data changes frequently
+    retry: 2,
+    refetchInterval: 5 * 60 * 1000, // Auto refresh every 5 minutes
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+  });
 
-  useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
+  // Show error toast if there's an error
+  if (error) {
+    const message = error?.response?.data?.detail || error?.message || "Failed to load dashboard";
+    toaster.create({
+      title: "Xatolik",
+      description: message,
+      status: "error",
+    });
+  }
 
-  return { data, loading, error, refetch: fetchDashboard };
+  return { 
+    data: dashboardData, 
+    loading, 
+    error, 
+    refetch: fetchDashboard 
+  };
 }
 
 

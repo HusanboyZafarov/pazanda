@@ -7,9 +7,35 @@ import {
   Input,
   Flex,
   Text,
-  Switch,
+  createListCollection,
+  Select,
+  InputGroup,
 } from "@chakra-ui/react";
 import { RxCross2 } from "react-icons/rx";
+import { useIMask } from 'react-imask';
+
+const PhoneInput = ({ value, onChange }) => {
+  const { ref } = useIMask({
+    mask: '+{998} 00 000-00-00',
+    onAccept: (value) => onChange(value),
+    placeholder: '+998 __ ___-__-__'
+  });
+
+  return (
+    <Input
+      ref={ref}
+      placeholder="+998 __ ___-__-__"
+      inputMode="numeric"
+      bg="white"
+      borderColor="gray.400"
+      paddingLeft="40px"
+      _focus={{
+        borderColor: "primary.light",
+        boxShadow: "0 0 0 1px #379570",
+      }}
+    />
+  );
+};
 
 const EditCook = ({ isOpen, onClose, cook, onSave }) => {
   const [formData, setFormData] = useState({
@@ -21,14 +47,10 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
     tariff: "",
   });
 
-  // 🔹 Eski ma’lumotlarni inputlarga joylash
   useEffect(() => {
-    // Dialog ochilganda va cook o'zgarganda formani yangilash
     if (isOpen && cook) {
-      // Debug: cook obyektini ko'rsatish
       console.log("EditCook - cook obyekti:", cook);
       
-      // full_name ni to'g'ri ajratish - birinchi qism ism, qolgani familiya
       const nameParts = cook.full_name?.split(" ") || [];
       const name = nameParts[0] || "";
       const lastname = nameParts.slice(1).join(" ") || "";
@@ -38,13 +60,10 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
         lastname,
         phone: cook.phone || cook.phone_number || cook.user_phone || "",
         rating: cook.rating || cook.rating_value || String(cook.rating || ""),
-        // Backenddan kelgan ma'lumotlar address yoki region bo'lishi mumkin
         region: cook.region || cook.address || cook.location || "",
-        // Backenddan kelgan ma'lumotlar tarif yoki tariff bo'lishi mumkin
         tariff: cook.tarif || cook.tariff || cook.pricing || "",
       });
     } else if (!isOpen) {
-      // Dialog yopilganda formani tozalash
       setFormData({
         name: "",
         lastname: "",
@@ -66,9 +85,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
       full_name: `${formData.name} ${formData.lastname}`.trim(),
       phone: formData.phone,
       rating: formData.rating,
-      // API da `address` maydoni bor, biz hududni shu yerga yuboramiz
       address: formData.region,
-      // Qolgan required bo'lmagan maydonlar backendda default qoladi
     };
 
     onSave(payload);
@@ -118,6 +135,52 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
                   </Box>
 
                   <Box>
+                    <Text mb={1}>Hudud</Text>
+
+                    <InputGroup flex={1}>
+                    <Select.Root
+                      collection={regions}
+                      value={[formData.region]}               
+                      onValueChange={(details) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          region: details.value[0],        
+                        }))
+                      }
+                      portalled
+                    >
+                      <Select.HiddenSelect />
+
+                      <Select.Trigger>
+                        <Select.ValueText placeholder="Hudud tanlang" />
+                        <Select.Indicator />
+                      </Select.Trigger>
+
+                      <Select.Positioner>
+                        <Select.Content maxH="200px" overflowY="auto" zIndex={9999}>
+                          {regions.items.map((item) => (
+                            <Select.Item key={item.value} item={item}>
+                              {item.label}
+                              <Select.ItemIndicator />
+                            </Select.Item>
+                          ))}
+                        </Select.Content>
+                      </Select.Positioner>
+                    </Select.Root>
+
+                    </InputGroup>
+                  </Box>
+                </Box>
+
+                <Box flex="1" display="flex" flexDirection="column" gap={4}>
+                  <Box>
+                    <Text mb={1}>Telefon raqami</Text>
+                    <PhoneInput 
+                      value={formData.phone}
+                      onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
+                    />
+                  </Box>
+                  <Box>
                     <Text mb={1}>Reyting</Text>
                     <Input
                       name="rating"
@@ -125,27 +188,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
                       onChange={handleChange}
                     />
                   </Box>
-                </Box>
 
-                {/* O‘ng tomoni */}
-                <Box flex="1" display="flex" flexDirection="column" gap={4}>
-                  <Box>
-                    <Text mb={1}>Telefon raqami</Text>
-                    <Input
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                    />
-                  </Box>
-
-                  <Box>
-                    <Text mb={1}>Hudud</Text>
-                    <Input
-                      name="region"
-                      value={formData.region}
-                      onChange={handleChange}
-                    />
-                  </Box>
 
                   <Box>
                     <Text mb={1}>Tarif</Text>
@@ -193,5 +236,22 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
     </Dialog.Root>
   );
 };
+const regions = createListCollection({
+  items: [
+    { label: "Toshkent", value: "toshkent" },
+    { label: "Andijon", value: "andijon" },
+    { label: "Namangan", value: "namangan" },
+    { label: "Farg'ona", value: "fargona" },
+    { label: "Samarqand", value: "samarqand" },
+    { label: "Buxoro", value: "buxoro" },
+    { label: "Xiva", value: "xiva" },
+    { label: "Nukus", value: "nukus" },
+    { label: "Termiz", value: "termiz" },
+    { label: "Guliston", value: "guliston" },
+    { label: "Jizzax", value: "jizzax" },
+    { label: "Navoiy", value: "navoiy" },
+    { label: "Qo'qon", value: "qoqon" },
+  ],
+});
 
 export default EditCook;

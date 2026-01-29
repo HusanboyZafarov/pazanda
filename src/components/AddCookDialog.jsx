@@ -19,6 +19,30 @@ import {
   MdLock,
   MdLogin,
 } from "react-icons/md";
+import { useIMask } from 'react-imask';
+
+const PhoneInput = ({ value, onChange }) => {
+  const { ref } = useIMask({
+    mask: '+{998} 00 000-00-00',
+    onAccept: (value) => onChange(value),
+    placeholder: '+998 __ ___-__-__'
+  });
+
+  return (
+    <Input
+      ref={ref}
+      placeholder="+998 __ ___-__-__"
+      inputMode="numeric"
+      bg="white"
+      borderColor="gray.400"
+      paddingLeft="40px"
+      _focus={{
+        borderColor: "primary.light",
+        boxShadow: "0 0 0 1px #379570",
+      }}
+    />
+  );
+};
 
 const AddCookDialog = ({ handleAddCook }) => {
   const [formData, setFormData] = useState({
@@ -166,11 +190,11 @@ const AddCookDialog = ({ handleAddCook }) => {
                         startElement={<MdLocationOn color="#adb5bd" />}
                       >
                         <Select.Root
-                          selected={(item) => item.value === formData.address}
-                          onSelect={(item) =>
+                          value={formData.address ? [formData.address] : []}
+                          onValueChange={(details) =>
                             setFormData((prev) => ({
                               ...prev,
-                              address: item.value,
+                              address: details.value[0],
                             }))
                           }
                           collection={regions}
@@ -205,21 +229,9 @@ const AddCookDialog = ({ handleAddCook }) => {
                         flex={1}
                         startElement={<MdPhone color="#adb5bd" />}
                       >
-                        <Input
-                          placeholder="Telefon raqam"
+                        <PhoneInput 
                           value={formData.phone}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              phone: e.target.value,
-                            }))
-                          }
-                          bg="white"
-                          borderColor="gray.400"
-                          _focus={{
-                            borderColor: "primary.light",
-                            boxShadow: "0 0 0 1px #379570",
-                          }}
+                          onChange={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
                         />
                       </InputGroup>
                     </Flex>

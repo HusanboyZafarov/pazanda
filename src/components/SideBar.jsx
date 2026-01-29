@@ -2,10 +2,18 @@ import React from "react";
 import { Box, VStack, Button, Text } from "@chakra-ui/react";
 import { FiHome, FiTruck, FiUsers, FiLogOut } from "react-icons/fi";
 import { MdGroups } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const SideBar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const navItems = [
     { label: "Asosiy", icon: <FiHome />, to: "/home" },
@@ -18,21 +26,21 @@ const SideBar = () => {
     <Box p={"12px"}>
       <Box
         w="300px"
-        h="100vh"
+        h="calc(100vh - 130px)"
         bg="white"
-        borderRadius="xl"
+        borderRadius="2xl"
         p={4}
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
         overflowY="auto"
+        position="fixed"
+        top="95px"
+        left="12px"
+        border="1px solid"
+        borderColor="gray.200"
       >
         <VStack align="stretch" spacing={2}>
-          <Box mb={4} p={3} borderBottom="1px solid" borderColor="gray.200">
-            <Text fontSize="xl" fontWeight="bold">
-              Dashboard
-            </Text>
-          </Box>
 
           {navItems.map((item) => {
             const isActive = location.pathname === item.to;
@@ -72,7 +80,7 @@ const SideBar = () => {
           borderColor="primary.light"
           _hover={{ bg: "primary.light", color: "white" }}
           leftIcon={<FiLogOut />}
-          onClick={() => console.log("Logout clicked")}
+          onClick={handleLogout}
         >
           Chiqish
         </Button>

@@ -4,26 +4,26 @@ import { FaUsers } from "react-icons/fa";
 const TotalNumber = ({ userCount = 0, cookCount = 0, courierCount = 0 }) => {
   const cards = [
     {
-      title: "Foydalanuvchilar soni",
+      title: "Foydalanuvchilar soni:",
       count: userCount,
     },
     {
-      title: "Umumiy pazanda soni",
+      title: "Umumiy pazanda soni:",
       count: cookCount,
     },
     {
-      title: "Umumiy kuryerlar soni",
+      title: "Umumiy kuryerlar soni:",
       count: courierCount,
     },
   ];
 
   return (
-    <Box display={"flex"}justifyContent={"space-between"} gap={"10px"} width={"1120px"}>
+    <Box display={"flex"}justifyContent={"space-between"} gap={"10px"} width={"1205px"}>
       {cards.map((card, index) => (
         <Flex
           key={index}
-          width={"380px"}
-          height={"150px"}
+          width={"400px"}
+          height={"110px"}
           bg="white"
           borderRadius="2xl"
           display={"flex"}
@@ -31,9 +31,10 @@ const TotalNumber = ({ userCount = 0, cookCount = 0, courierCount = 0 }) => {
           p="4"
           align="start"
           justifyContent={"center"}
-          boxShadow="md"
+          border="1px solid"
+          borderColor="gray.200"
         >
-          <Box display={"flex"}  >
+          <Box display="flex" justifyContent="center" alignItems="center" mb={2} gap={4}>
             <Box
               bg="#379FFF"
               borderRadius="full"
@@ -42,17 +43,19 @@ const TotalNumber = ({ userCount = 0, cookCount = 0, courierCount = 0 }) => {
               display="flex"
               alignItems="center"
               justifyContent="center"
-              mr="4"
             >
               <Icon as={FaUsers} color="white" />
             </Box>
-            <Text fontSize="sm" fontWeight={"bold"} color="gray.600">
+          <Box textAlign="start">
+            <Text fontSize="sm" fontWeight={"bold"} color="gray.600" mb={2}>
               {card.title}
             </Text>
+            <Text fontSize="2xl" color="gray.600" fontWeight={"bold"}>
+              {card.count}
+            </Text>
           </Box>
-          <Text fontSize="2xl" color="gray.600">
-            {card.count}
-          </Text>
+          </Box>
+
         </Flex>
       ))}
     </Box>
