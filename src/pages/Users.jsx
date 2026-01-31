@@ -156,7 +156,7 @@ const Users = () => {
               <Table.ColumnHeader>Foydalanuvchi ismi</Table.ColumnHeader>
               <Table.ColumnHeader>Ro'yxat sanasi</Table.ColumnHeader>
               <Table.ColumnHeader>Tel no'mer</Table.ColumnHeader>
-              <Table.ColumnHeader>Bloklash</Table.ColumnHeader>
+              <Table.ColumnHeader>Status</Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
 
