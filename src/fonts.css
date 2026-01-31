@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "system-ui-b";
+  src: url("./assets/fonts/Nunito-Bold.ttf");
+}
+
+@font-face {
+  font-family: "system-ui-sb";
+  src: url("./assets/fonts/Nunito-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: "system-ui-m";
+  src: url("./assets/fonts/Nunito-Medium.ttf");
+}
