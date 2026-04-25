@@ -22,16 +22,21 @@ import {
 import { useIMask } from 'react-imask';
 
 const PhoneInput = ({ value, onChange }) => {
-  const { ref } = useIMask({
-    mask: '+{998} 00 000-00-00',
-    onAccept: (value) => onChange(value),
-    placeholder: '+998 __ ___-__-__'
-  });
+  const { ref } = useIMask(
+    {
+      mask: '+{998} 00 000-00-00',
+      placeholder: '+998 __ ___-__-__'
+    },
+    {
+      onAccept: (value) => onChange(value),
+    }
+  );
 
   return (
     <Input
       ref={ref}
       placeholder="+998 __ ___-__-__"
+      value={value || "+998 "}
       inputMode="numeric"
       bg="white"
       borderColor="gray.400"

@@ -45,6 +45,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
     rating: "",
     region: "",
     tariff: "",
+    password: "",
   });
 
   useEffect(() => {
@@ -62,6 +63,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
         rating: cook.rating || cook.rating_value || String(cook.rating || ""),
         region: cook.region || cook.address || cook.location || "",
         tariff: cook.tarif || cook.tariff || cook.pricing || "",
+        password: cook.password || "",
       });
     } else if (!isOpen) {
       setFormData({
@@ -71,6 +73,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
         rating: "",
         region: "",
         tariff: "",
+        password: "",
       });
     }
   }, [isOpen, cook]);
@@ -86,6 +89,7 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
       phone: formData.phone,
       rating: formData.rating,
       address: formData.region,
+      password: formData.password,
     };
 
     onSave(payload);
@@ -170,6 +174,17 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
 
                     </InputGroup>
                   </Box>
+
+                  <Box>
+                    <Text mb={1}>Parol</Text>
+                    <Input
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Yangi parol"
+                    />
+                  </Box>
                 </Box>
 
                 <Box flex="1" display="flex" flexDirection="column" gap={4}>
@@ -188,7 +203,6 @@ const EditCook = ({ isOpen, onClose, cook, onSave }) => {
                       onChange={handleChange}
                     />
                   </Box>
-
 
                   <Box>
                     <Text mb={1}>Tarif</Text>
